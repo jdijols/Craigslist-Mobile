@@ -1,0 +1,17 @@
+---
+description: All user-facing UI text in the prototype must be lowercase
+globs: src/**/*.tsx
+alwaysApply: false
+---
+
+# Lowercase UI Text
+
+All visible UI text in the prototype must be fully lowercase — section titles, labels, buttons, headings, badges, etc. Never use title case, sentence case, or uppercase for any user-facing string.
+
+```tsx
+// bad
+<CollectionSection title="Popular Items in Hennepin Co" />
+
+// good
+<CollectionSection title="popular items in hennepin co" />
+```

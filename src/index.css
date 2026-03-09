@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Livefront palette ── */
+  --color-lf-navy: #244459;
+  --color-lf-off-black: #0e1b24;
+  --color-lf-body: #374952;
+  --color-lf-secondary: #66747a;
+  --color-lf-blue: #006db0;
+  --color-lf-blue-light: #2b91d9;
+  --color-lf-blue-bg: #e3f5ff;
+  --color-lf-bg: #f9fafb;
+  --color-lf-surface: #ffffff;
+  --color-lf-border: #e1e4e5;
+  --color-lf-pill-bg: #eff0f1;
+  --color-lf-lavender: #eeeeff;
+  --color-lf-green: #67a300;
+  --color-lf-teal: #073b3a;
+
+  /* ── Craigslist brand (kept for in-phone mockups) ── */
+  --color-cl-purple: #7A1FA2;
+  --color-cl-purple-secondary: #7A1FA2;
+  --color-cl-purple-light: #7A1FA2;
+  --color-cl-bg: #FAFAFA;
+  --color-cl-surface: #ffffff;
+  --color-cl-border: #d9d9d9;
+  --color-cl-text: #111111;
+  --color-cl-text-muted: #6D6D6D;
+  --color-cl-accent: #7A1FA2;
+  --color-cl-price: #111111;
+  --color-cl-bg-secondary: #f2f2f2;
+  --color-cl-destructive: #B71C1C;
+  --color-cl-favorite: #FACC15;
+
+  /* ── Slide-level tokens (Livefront-branded) ── */
+  --color-slide-bg: #f9fafb;
+  --color-slide-surface: #ffffff;
+  --color-slide-border: #e1e4e5;
+  --color-slide-text: #0e1b24;
+  --color-slide-text-muted: #66747a;
+
+  /* ── Typography ── */
+  --font-sans: Arial, sans-serif;
+  --font-serif: "DM Serif Display", "Georgia", serif;
+  --font-mono: ui-monospace, monospace;
+  --font-cl-sans: "Inter", Arial, sans-serif;
+
+  /* ── Sizing ── */
+  --spacing-search-input: 36px;
+  --spacing-header-bar: 64px;
+
+  /* ── Radii ── */
+  --radius-card: 4px;
+  --radius-card-lg: 12px;
+  --radius-button: 4px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 3px 12px rgba(14, 27, 36, 0.06);
+  --shadow-elevated: 0 6px 24px rgba(14, 27, 36, 0.10);
+
+  /* ── Map tokens (light) ── */
+  --color-cl-map-bg: #e8e4df;
+  --color-cl-map-road: #d4d0cb;
+  --color-cl-map-road-minor: #ddd8d3;
+  --color-cl-map-water: #b8d4e8;
+  --color-cl-map-water-inner: #a8c8de;
+  --color-cl-map-park: #c8dbb8;
+  --color-cl-map-highway: #ccc7c1;
+  --color-cl-map-label: #9e998f;
+
+  /* ── Image overlay tokens ── */
+  --color-cl-overlay-bg: rgba(255, 255, 255, 0.92);
+  --color-cl-overlay-bg-light: rgba(255, 255, 255, 0.80);
+}
+
+@media (prefers-color-scheme: dark) {
+  .phone-screen {
+    --color-cl-purple: #AD6FF5;
+    --color-cl-purple-secondary: #AD6FF5;
+    --color-cl-purple-light: #AD6FF5;
+    --color-cl-bg: #000000;
+    --color-cl-surface: #1C1C1E;
+    --color-cl-border: #38383A;
+    --color-cl-text: #F5F5F7;
+    --color-cl-text-muted: #94949A;
+    --color-cl-accent: #AD6FF5;
+    --color-cl-price: #F5F5F7;
+    --color-cl-bg-secondary: #2C2C2E;
+    --color-cl-destructive: #E57373;
+
+    --color-cl-map-bg: #1a1a1e;
+    --color-cl-map-road: #2c2c30;
+    --color-cl-map-road-minor: #242428;
+    --color-cl-map-water: #0f2a40;
+    --color-cl-map-water-inner: #143350;
+    --color-cl-map-park: #1a2e1a;
+    --color-cl-map-highway: #3a3a3e;
+    --color-cl-map-label: #808088;
+
+    --color-cl-overlay-bg: rgba(44, 44, 46, 0.92);
+    --color-cl-overlay-bg-light: rgba(44, 44, 46, 0.80);
+
+    --shadow-card: 0 3px 12px rgba(0, 0, 0, 0.3);
+    --shadow-elevated: 0 6px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-lf-bg);
+  color: var(--color-lf-off-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Thin, subtle scrollbar for side panels / modals */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:active {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Solid range slider track – no border, stroke, or shadow */
+.distance-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+.distance-slider::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-cl-accent) 0%,
+    var(--color-cl-accent) var(--track-fill, 0%),
+    var(--color-cl-border) var(--track-fill, 0%),
+    var(--color-cl-border) 100%
+  );
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+.distance-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-cl-accent) 0%,
+    var(--color-cl-accent) var(--track-fill, 0%),
+    var(--color-cl-border) var(--track-fill, 0%),
+    var(--color-cl-border) 100%
+  );
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+.distance-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-cl-accent);
+  cursor: pointer;
+  margin-top: -6px;
+}
+.distance-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-cl-accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .scrollbar-thin {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 255, 255, 0.35);
+  }
+}

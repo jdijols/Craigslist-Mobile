@@ -1,0 +1,272 @@
+/*
+ * iPhone 13 bezel — pure CSS.
+ *
+ * Display (logical): 390 × 844 px (matches iPhone 13 screenshots).
+ * Frame is 414×868 px; scales so height fits in 90vh (with 0.9 fallback).
+ * Scaling uses transform so the Figma-converted content inside scales with the frame.
+ *
+ * Wrapper uses min-width/min-height: 0 so flex doesn't force it to content size;
+ * bezel is absolutely positioned so its layout size doesn't block the scaled dimensions.
+ */
+
+/* Wrapper: fixed scaled size; room for drop shadow so it isn't clipped */
+.phone-wrapper {
+  --phone-w: 414px;
+  --phone-h: 868px;
+  --shadow-margin: 48px;
+  /* Scale so height ≤ 90vh; length/length gives unitless number for scale(). Fallback 0.9 if calc unsupported */
+  --scale: 0.9;
+  --scale: min(1, calc(90vh / 868px));
+  position: relative;
+  width: calc(var(--phone-w) * var(--scale) + var(--shadow-margin) * 2);
+  height: calc(var(--phone-h) * var(--scale) + var(--shadow-margin) * 2);
+  min-width: 0;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.phone-bezel {
+  --bezel: 12px;
+  --screen-w: 390px;
+  --screen-h: 844px;
+  --corner-outer: 50px;
+  --corner-inner: 42px;
+
+  position: absolute;
+  top: var(--shadow-margin);
+  left: var(--shadow-margin);
+  width: calc(var(--screen-w) + var(--bezel) * 2);
+  height: calc(var(--screen-h) + var(--bezel) * 2);
+  transform: scale(var(--scale));
+  transform-origin: top left;
+
+  background: linear-gradient(
+    145deg,
+    #2a2a2e 0%,
+    #1c1c1e 40%,
+    #141416 100%
+  );
+  border-radius: var(--corner-outer);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  z-index: 40;
+}
+
+/* Side buttons */
+.phone-bezel::before {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: 160px;
+  width: 3px;
+  height: 64px;
+  background: linear-gradient(180deg, #3a3a3c, #2c2c2e);
+  border-radius: 0 2px 2px 0;
+  z-index: 40;
+  overflow: hidden;
+}
+
+.phone-bezel::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 130px;
+  width: 3px;
+  height: 36px;
+  background: linear-gradient(180deg, #3a3a3c, #2c2c2e);
+  border-radius: 2px 0 0 2px;
+  box-shadow: 0 60px 0 #2c2c2e, 0 96px 0 #2c2c2e;
+  z-index: 40;
+  overflow: hidden;
+}
+
+/* Bezel overlay — sits on top of all screen content to cover any
+   backdrop-filter compositing layers that escape .phone-screen's
+   rounded overflow clip at the corners. */
+.bezel-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--corner-outer);
+  box-shadow: inset 0 0 0 var(--bezel) #1c1c1e;
+  z-index: 35;
+  pointer-events: none;
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: calc(var(--bezel) + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 34px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 55;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Screen area — clips app content to the inner rounded rect.
+   mask-image forces a compositing boundary so backdrop-filter layers
+   inside (e.g. the tab bar glass) cannot escape the rounded clip. */
+.phone-screen {
+  --safe-area-top: 44px;
+  --chrome-offset: 47px;
+  position: absolute;
+  top: var(--bezel);
+  left: var(--bezel);
+  right: var(--bezel);
+  bottom: var(--bezel);
+  padding-top: var(--safe-area-top);
+  background: var(--color-cl-surface, #ffffff);
+  border-radius: var(--corner-inner);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  font-family: "Inter", Arial, sans-serif;
+  color-scheme: light dark;
+}
+
+.phone-screen * {
+  font-family: "Inter", Arial, sans-serif;
+}
+
+/*
+ * Typography tuning for Inter, aligned with iOS Dynamic Type metrics.
+ *
+ * Tracking: Inter has tighter default spacing than Arial, so positive
+ * adjustments are smaller. Negative tracking at headline sizes is kept.
+ *
+ * Line-height: Matched to iOS text styles. 14px is interpolated
+ * (not a standard iOS stop) but used throughout the card system.
+ */
+.phone-screen .text-\[11px\] {
+  letter-spacing: 0.02em;
+  line-height: 13px;
+}
+.phone-screen .text-\[12px\] {
+  letter-spacing: 0.01em;
+  line-height: 16px;
+}
+.phone-screen .text-\[13px\] {
+  letter-spacing: 0;
+  line-height: 18px;
+}
+.phone-screen .text-\[14px\] {
+  letter-spacing: 0;
+  line-height: 19px;
+}
+.phone-screen .text-\[15px\] {
+  letter-spacing: 0;
+  line-height: 20px;
+}
+.phone-screen .text-\[17px\] {
+  letter-spacing: -0.01em;
+  line-height: 22px;
+}
+.phone-screen .text-\[18px\] {
+  letter-spacing: -0.01em;
+  line-height: 23px;
+}
+.phone-screen .text-\[22px\] {
+  letter-spacing: -0.02em;
+  line-height: 28px;
+}
+.phone-screen .text-sm {
+  letter-spacing: 0;
+}
+.phone-screen .text-base {
+  letter-spacing: 0;
+}
+
+/* Hide system cursor over the screen when showing the circle (mobile simulator mode) */
+.phone-screen.cursor-none,
+.phone-screen.cursor-none * {
+  cursor: none !important;
+}
+
+/* Home indicator bar — hidden */
+.home-indicator {
+  display: none;
+  position: absolute;
+  bottom: calc(var(--bezel) + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 100px;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* Status bar — three-column layout flanking the Dynamic Island.
+   Dynamic Island: top 10px, height 34px → vertical center at 27px from screen edge.
+   Status bar height matches safe-area-top (44px); padding-top shifts content to
+   vertically center on the Dynamic Island midpoint. */
+.status-bar {
+  position: absolute;
+  top: var(--bezel);
+  left: var(--bezel);
+  right: var(--bezel);
+  height: 44px;
+  padding: 7px 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 60;
+  pointer-events: none;
+  color: var(--color-cl-text, #000);
+  font-family: "Inter", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-sizing: border-box;
+}
+
+.status-bar-left,
+.status-bar-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.status-bar-left {
+  justify-content: center;
+}
+
+.status-bar-center {
+  width: 126px;
+  flex-shrink: 0;
+}
+
+.status-bar-right {
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Dark status bar — triggered by ImageViewer via data attribute */
+.phone-screen[data-dark-status-bar]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--safe-area-top);
+  background: #000;
+  z-index: 52;
+}
+
+.phone-bezel:has(.phone-screen[data-dark-status-bar]) .status-bar {
+  color: #fff;
+}
