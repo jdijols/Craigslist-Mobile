@@ -36,7 +36,7 @@ export function CardFavoriteButton({
         className="h-6 w-6 drop-shadow-sm"
         strokeWidth={1.8}
         stroke="white"
-        fill={favorited ? "var(--color-cl-favorite)" : "rgba(0,0,0,0.45)"}
+        fill={favorited ? "var(--color-cl-favorite)" : "var(--color-cl-text-muted)"}
       />
     </button>
   );

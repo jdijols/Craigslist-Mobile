@@ -24,6 +24,8 @@ export interface PrototypeStep {
   homeCategory?: string;
   /** Pre-select a subcategory within the active category. */
   homeSubcategory?: string;
+  /** When true, opens the subcategory side drawer for the active category. */
+  homeSubcategoryDrawerOpen?: boolean;
   /** Force the home screen view mode (e.g. "map"). */
   homeViewMode?: "thumb" | "list" | "gallery" | "grid" | "map";
 }

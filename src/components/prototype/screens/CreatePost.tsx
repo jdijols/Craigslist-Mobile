@@ -87,19 +87,19 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
 
             {/* Form fields */}
             <div className="mx-4 mt-4 space-y-3">
-              <div className="rounded-[--radius-card] border border-cl-border bg-cl-surface px-4 py-3 min-h-[44px]">
+              <div className="rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
                 <label className="text-[11px] text-cl-text-muted" htmlFor="cp-title">title</label>
                 <input
                   id="cp-title"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="mt-0.5 block w-full bg-transparent text-[15px] text-cl-text outline-none placeholder:text-cl-text-muted"
+                  className="mt-0.5 block w-full bg-transparent text-base text-cl-text outline-none placeholder:text-cl-text-muted"
                   placeholder="what are you posting?"
                 />
               </div>
               <div className="flex gap-3">
-                <div className="flex-1 rounded-[--radius-card] border border-cl-border bg-cl-surface px-4 py-3 min-h-[44px]">
+                <div className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
                   <label className="text-[11px] text-cl-text-muted" htmlFor="cp-price">price</label>
                   <div className="mt-0.5 flex items-center">
                     <span className="text-[15px] text-cl-price">$</span>
@@ -109,18 +109,18 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
                       inputMode="numeric"
                       value={price}
                       onChange={(e) => setPrice(e.target.value.replace(/[^0-9]/g, ""))}
-                      className="w-full bg-transparent text-[15px] text-cl-price outline-none placeholder:text-cl-text-muted"
+                      className="w-full bg-transparent text-base text-cl-price outline-none placeholder:text-cl-text-muted"
                       placeholder="0"
                     />
                   </div>
                 </div>
-                <div className="flex-1 rounded-[--radius-card] border border-cl-border bg-cl-surface px-4 py-3 min-h-[44px]">
+                <div className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
                   <label className="text-[11px] text-cl-text-muted" htmlFor="cp-category">category</label>
                   <select
                     id="cp-category"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="mt-0.5 block w-full bg-transparent text-[15px] text-cl-text outline-none appearance-none"
+                    className="mt-0.5 block w-full bg-transparent text-base text-cl-text outline-none appearance-none"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -128,7 +128,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
                   </select>
                 </div>
               </div>
-              <div className="rounded-[--radius-card] border border-cl-border bg-cl-surface px-4 py-3 min-h-[44px]">
+              <div className="rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
                 <span className="text-[11px] text-cl-text-muted">location</span>
                 <p className="mt-0.5 text-[15px] text-cl-text">
                   minneapolis (auto-detected)
@@ -145,7 +145,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
               disabled={!title.trim()}
               className="flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90 disabled:opacity-50"
             >
-              <span className="text-[17px] font-semibold text-white">
+              <span className="text-[17px] font-semibold text-cl-accent-text">
                 publish
               </span>
             </button>

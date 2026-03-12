@@ -18,8 +18,8 @@ export function SummarySlide() {
             <div>
               <h3 className="text-sm font-bold text-lf-navy">Problem</h3>
               <p className="mt-1 text-sm leading-relaxed text-lf-body">
-                Craigslist’s mobile experience hasn’t evolved—users and trust are
-                leaking to photo-first, in-app-messaging competitors.
+                CL&rsquo;s mobile experience hasn&rsquo;t evolved. Users and
+                trust are leaking to modern competitors.
               </p>
             </div>
           </li>
@@ -30,8 +30,8 @@ export function SummarySlide() {
             <div>
               <h3 className="text-sm font-bold text-lf-navy">Approach</h3>
               <p className="mt-1 text-sm leading-relaxed text-lf-body">
-                A native iOS app grounded in our user framework, research, and design principles, with a clear IA and key screens:
-                home, browse, search, and post detail.
+                Native iOS app grounded in user research and design principles.
+                Key screens: home, browse, search, post detail.
               </p>
             </div>
           </li>
@@ -50,7 +50,7 @@ export function SummarySlide() {
         </ul>
 
         <p className="mt-8 text-sm leading-relaxed text-lf-body text-center">
-          I’m happy to go deeper on any of this or take your questions.
+          Let&rsquo;s schedule time to walk through the prototype live.
         </p>
       </div>
     </div>

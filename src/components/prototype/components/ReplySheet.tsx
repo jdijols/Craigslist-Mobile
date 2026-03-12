@@ -45,9 +45,9 @@ export function ReplySheet({ open, listingTitle, onSend, onClose }: ReplySheetPr
               </p>
             </div>
 
-            <div className="mx-4 rounded-[--radius-card] border border-cl-border bg-cl-bg-secondary p-3">
+            <div className="mx-4 rounded-[--radius-card] border-2 border-cl-border bg-cl-bg-secondary p-3 focus-within:border-cl-accent transition-colors">
               <textarea
-                className="w-full resize-none bg-transparent text-[14px] text-cl-text outline-none placeholder:text-cl-text-muted"
+                className="w-full resize-none bg-transparent text-base text-cl-text outline-none placeholder:text-cl-text-muted"
                 rows={3}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -60,8 +60,8 @@ export function ReplySheet({ open, listingTitle, onSend, onClose }: ReplySheetPr
                 onClick={() => onSend(message)}
                 className="flex flex-1 min-h-[44px] items-center justify-center gap-2 rounded-[--radius-button] bg-cl-accent py-3 shadow-[--shadow-card] active:opacity-90"
               >
-                <Send className="h-4 w-4 text-white" />
-                <span className="text-[15px] font-semibold text-white">send</span>
+                <Send className="h-4 w-4 text-cl-accent-text" />
+                <span className="text-[15px] font-semibold text-cl-accent-text">send</span>
               </button>
               <button
                 type="button"

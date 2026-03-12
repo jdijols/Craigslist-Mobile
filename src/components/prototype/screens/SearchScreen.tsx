@@ -243,10 +243,10 @@ export function SearchScreen({
   return (
     <div className="flex h-full flex-col bg-cl-bg">
       {/* Header */}
-      <div className="bg-white border-b-[0.5px] border-cl-border">
+      <div className="bg-cl-surface border-b-[0.5px] border-cl-border">
         <div className="flex h-header-bar items-center gap-2 px-4">
           <div
-            className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border border-cl-border bg-white px-3 h-search-input cursor-text"
+            className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input cursor-text focus-within:border-cl-accent transition-colors"
             onClick={() => inputRef.current?.focus()}
           >
             <SearchIcon className="h-4 w-4 shrink-0 text-cl-text-muted pointer-events-none" />
@@ -259,7 +259,7 @@ export function SearchScreen({
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={searchPlaceholder}
-              className="w-0 flex-1 bg-transparent text-[15px] text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
+              className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
             />
             {draft.length > 0 && (
               <button
@@ -314,7 +314,7 @@ export function SearchScreen({
 
       {/* Content area */}
       <div
-        className={`flex-1 overflow-y-auto overscroll-contain scrollbar-none pb-[72px] ${contentIsEmpty ? "bg-cl-bg" : "bg-white"}`}
+        className={`flex-1 overflow-y-auto overscroll-contain scrollbar-none pb-[72px] ${contentIsEmpty ? "bg-cl-bg" : "bg-cl-surface"}`}
         onScroll={handleContentScroll}
       >
         {isTyping ? (
@@ -500,7 +500,7 @@ function TypingView({
   filteredSaved,
   filteredRecent,
   suggestions,
-  savedFilterCount,
+  savedFilterCount: _savedFilterCount,
   formatSavedSecondLine,
   filterCountFor: getFilterCount,
   onSubmit,

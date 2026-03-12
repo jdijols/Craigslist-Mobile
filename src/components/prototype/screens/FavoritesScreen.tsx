@@ -7,7 +7,6 @@ import {
   LayoutList,
   SlidersHorizontal,
 } from "lucide-react";
-import type { ScreenId } from "../types";
 import type { ViewMode, ListingData } from "../../ui/cards";
 import { useFavorites, removeFavorite, resetFavorites } from "../../../data/favorites";
 import { useOverlayFade } from "../../../hooks/useOverlayFade";
@@ -16,7 +15,6 @@ import { ShareSheet } from "../components/ShareSheet";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { SortFilterDrawer, DEFAULT_SORT, DEFAULT_DISTANCE, type SortOption } from "../components/SortFilterDrawer";
 import { ViewModeDrawer } from "../components/ViewModeDrawer";
-import { ThumbCard } from "../../ui/cards/ThumbCard";
 import { GridCard } from "../../ui/cards/GridCard";
 import { ListCard } from "../../ui/cards/ListCard";
 import { GalleryCard } from "../../ui/cards/GalleryCard";
@@ -25,6 +23,12 @@ import { MAP_CENTER } from "../components/StaticMapLayer";
 import { haversineMiles } from "../../../utils/geo";
 import { parsePriceToCents, parseTimeToMinutes, parseDistanceOption } from "../../../utils/format";
 import { useLocation } from "../../../contexts/LocationContext";
+import type { ScreenId } from "../types";
+
+interface FavoritesScreenProps {
+  onNavigate?: (screen: ScreenId) => void;
+  onOpenListing?: (listing: ListingData) => void;
+}
 
 export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenProps) {
   const favorites = useFavorites();
@@ -168,7 +172,7 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
 
           {/* Bottom-left: Change view */}
           <div
-            className={`absolute bottom-[84px] left-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
+            className={`absolute bottom-[84px] left-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
             style={{ height: 40 }}
           >
             <button
@@ -187,7 +191,7 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
 
           {/* Bottom-right: Filter + Share */}
           <div
-            className={`absolute bottom-[84px] right-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
+            className={`absolute bottom-[84px] right-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
             style={{ height: 80 }}
           >
             <button

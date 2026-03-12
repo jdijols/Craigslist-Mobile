@@ -93,6 +93,8 @@ interface HomeScreenProps {
   restoreDataRef?: React.RefObject<RestoreData | null>;
   onScrollToTopRequest?: () => void;
   initialViewMode?: ViewMode;
+  /** When true, opens the subcategory drawer (e.g. for presentation slides). */
+  initialSubcategoryDrawerOpen?: boolean;
 }
 
 export function HomeScreen({
@@ -109,8 +111,12 @@ export function HomeScreen({
   restoreDataRef,
   onScrollToTopRequest,
   initialViewMode,
+  initialSubcategoryDrawerOpen,
 }: HomeScreenProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(initialSubcategoryDrawerOpen ?? false);
+  useEffect(() => {
+    setDrawerOpen(initialSubcategoryDrawerOpen === true);
+  }, [initialSubcategoryDrawerOpen]);
   const [showFilters, setShowFilters] = useState(false);
   const [filterInitialSections, setFilterInitialSections] = useState<FilterSection[] | undefined>(undefined);
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode ?? "thumb");
@@ -357,7 +363,7 @@ export function HomeScreen({
   return (
     <div className="relative flex h-full flex-col">
       {/* Header */}
-      <div className="bg-white border-b-[0.5px] border-cl-border">
+      <div className="bg-cl-surface border-b-[0.5px] border-cl-border">
         {/* Locator / search row */}
         <div className="flex h-header-bar items-center gap-3 pl-1.5 pr-4">
           <button
@@ -471,13 +477,12 @@ export function HomeScreen({
       {showOverlay && (
         <>
           <div
-            className={`absolute bottom-[84px] left-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
-            style={{ height: 40 }}
+            className={`absolute bottom-[84px] left-3 z-20 flex min-w-[44px] min-h-[44px] w-11 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
           >
             <button
               type="button"
               onClick={() => setViewDrawerOpen(true)}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Change view"
             >
               {isMapView ? (
@@ -489,8 +494,8 @@ export function HomeScreen({
           </div>
 
           <div
-            className={`absolute bottom-[84px] right-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
-            style={{ height: isMapView ? 120 : 160 }}
+            className={`absolute bottom-[84px] right-3 z-20 flex min-w-[44px] w-11 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
+            style={{ minHeight: isMapView ? 120 : 160 }}
           >
             {!isMapView && (
               <>
@@ -500,7 +505,7 @@ export function HomeScreen({
                     setFilterInitialSections(["sort"]);
                     setShowFilters(true);
                   }}
-                  className="flex flex-1 w-full items-center justify-center outline-none"
+                  className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
                   aria-label="Sort"
                 >
                   <div className="relative">
@@ -520,7 +525,7 @@ export function HomeScreen({
                 setFilterInitialSections(sections.length > 0 ? sections : undefined);
                 setShowFilters(true);
               }}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Filter"
             >
               <div className="relative">
@@ -532,7 +537,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={handleSave}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label={isSaved ? "Search saved" : "Save this search"}
             >
               <div className="relative">
@@ -547,7 +552,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={() => setShareOpen(true)}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Share"
             >
               <ShareIcon className="h-5 w-5 text-cl-text shrink-0" />
@@ -629,7 +634,7 @@ export function HomeScreen({
 // ── Curated Home Feed ───────────────────────────────────────────────────────
 
 function CuratedFeed({
-  onNavigate,
+  onNavigate: _onNavigate,
   onOpenListing,
   onCategoryChange,
   onSubcategoryChange,
@@ -750,7 +755,7 @@ function CategoryContent({
   overlayVisible,
   restoreOverlay,
   viewMode,
-  onViewModeChange,
+  onViewModeChange: _onViewModeChange,
   activeCategory,
   activeSubcategory,
   activeSort,
@@ -759,7 +764,7 @@ function CategoryContent({
   minPrice,
   maxPrice,
   hasActiveFilters,
-  hasActiveSort,
+  hasActiveSort: _hasActiveSort,
   onFilterReset,
   headerCollapsed,
   onRestoreHeader,
@@ -935,7 +940,7 @@ function CategoryContent({
                 onClick={onFilterReset}
                 className="mt-4 flex w-full max-w-[220px] min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90"
               >
-                <span className="text-[17px] font-semibold text-white">clear filters</span>
+                <span className="text-[17px] font-semibold text-cl-accent-text">clear filters</span>
               </button>
               <button
                 type="button"
@@ -965,7 +970,7 @@ function CategoryContent({
                 onClick={() => onNavigate?.("create-post")}
                 className="mt-4 flex w-full max-w-[220px] min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90"
               >
-                <span className="text-[17px] font-semibold text-white">add a post here</span>
+                <span className="text-[17px] font-semibold text-cl-accent-text">add a post here</span>
               </button>
             </>
           )}
@@ -1036,11 +1041,11 @@ function CategoryContent({
 
           {/* Top-right: Navigate (map only) */}
           {isMapView && (
-            <div className={`absolute top-3 right-3 z-20 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}>
+            <div className={`absolute top-3 right-3 z-20 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}>
               <button
                 type="button"
                 onClick={handleLocateOnMap}
-                className="flex h-full w-full items-center justify-center outline-none"
+                className="flex h-full w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
                 aria-label="Use current location"
               >
                 <Navigation className="h-5 w-5 text-cl-text shrink-0 translate-x-[-2px] translate-y-[1px]" />
@@ -1175,7 +1180,7 @@ function SearchResultsContent({
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-white">
+    <div className="flex flex-1 flex-col overflow-hidden bg-cl-surface">
       {viewMode === "map" ? (
         <div className="flex-1 min-h-0 flex flex-col pb-[72px]">
           <MapView

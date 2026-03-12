@@ -142,7 +142,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
               <CollapsibleSection label="price range" defaultExpanded={initialSections?.includes("price")}>
                 <div className="px-5 pb-2">
                   <div className="flex gap-3">
-                    <label className="flex-1 rounded-[--radius-card] border border-cl-border bg-white px-3 py-2.5 focus-within:border-cl-accent transition-colors">
+                    <label className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-3 py-2.5 focus-within:border-cl-accent transition-colors">
                       <span className="text-[11px] text-cl-text-muted block">min</span>
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-[17px] text-cl-price">$</span>
@@ -155,11 +155,11 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
                             onMinPriceChange(v);
                           }}
                           placeholder="0"
-                          className="w-full bg-transparent text-[17px] text-cl-price placeholder:text-cl-text-muted/50 outline-none"
+                          className="w-full bg-transparent text-[17px] text-cl-price placeholder:text-cl-text-muted outline-none"
                         />
                       </div>
                     </label>
-                    <label className="flex-1 rounded-[--radius-card] border border-cl-border bg-white px-3 py-2.5 focus-within:border-cl-accent transition-colors">
+                    <label className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-3 py-2.5 focus-within:border-cl-accent transition-colors">
                       <span className="text-[11px] text-cl-text-muted block">max</span>
                       <div className="flex items-baseline gap-1.5">
                         {maxPrice && <span className="text-[17px] text-cl-price">$</span>}
@@ -172,7 +172,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
                             onMaxPriceChange(v);
                           }}
                           placeholder="none"
-                          className="w-full bg-transparent text-[17px] text-cl-price placeholder:text-cl-text-muted/50 outline-none"
+                          className="w-full bg-transparent text-[17px] text-cl-price placeholder:text-cl-text-muted outline-none"
                         />
                       </div>
                     </label>
@@ -187,7 +187,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
                   onClick={onClose}
                   className="flex w-full min-h-[44px] items-center justify-center rounded-[--radius-button] bg-cl-accent py-3 shadow-[--shadow-card] outline-none active:opacity-90 transition-opacity"
                 >
-                  <span className="text-[15px] font-semibold text-white">
+                  <span className="text-[15px] font-semibold text-cl-accent-text">
                     show results
                   </span>
                 </button>

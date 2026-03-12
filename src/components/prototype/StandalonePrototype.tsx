@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { AppPrototype } from "./AppPrototype";
 import { OverlayPortalProvider } from "../layout/OverlayPortal";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import type { ScreenId } from "./types";
 import "../layout/PhoneFrame.css";
 
@@ -10,24 +11,39 @@ export function StandalonePrototype() {
   const [cursorOver, setCursorOver] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
 
+  /** Touch-primary devices (phones): no custom cursor, use default. Prevents blue dot flash. */
+  const isTouchDevice = useMediaQuery("(pointer: coarse)");
+
   const handleNavigate = useCallback((s: ScreenId) => {
     setScreen(s);
   }, []);
 
-  const handlePointerEnter = useCallback(() => setCursorOver(true), []);
+  const handlePointerEnter = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isTouchDevice && e.pointerType !== "touch") setCursorOver(true);
+    },
+    [isTouchDevice],
+  );
   const handlePointerLeave = useCallback(() => setCursorOver(false), []);
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    setCursorOver(true);
-    setCursorPos({ x: e.clientX, y: e.clientY });
-  }, []);
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isTouchDevice && e.pointerType !== "touch") {
+        setCursorOver(true);
+        setCursorPos({ x: e.clientX, y: e.clientY });
+      }
+    },
+    [isTouchDevice],
+  );
+
+  const showCustomCursor = !isTouchDevice && cursorOver;
 
   return (
     <div
-      className="h-dvh w-full flex justify-center"
-      style={{ background: "linear-gradient(145deg, rgba(122, 31, 162, 0.10) 0%, rgba(122, 31, 162, 0.07) 100%), #f9fafb" }}
+      className={`standalone-prototype h-dvh w-full flex justify-center${isTouchDevice ? " touch-device" : ""}`}
+      style={{ background: "var(--standalone-bg)" }}
     >
       <div
-        className={`phone-screen w-full max-w-[540px]${cursorOver ? " cursor-none" : ""}`}
+        className={`phone-screen w-full max-w-[540px]${showCustomCursor ? " cursor-none" : ""}`}
         style={{
           position: "relative",
           top: "auto",
@@ -58,7 +74,7 @@ export function StandalonePrototype() {
           }}
         />
       </div>
-      {cursorOver && (
+      {showCustomCursor && (
         <div
           className="pointer-events-none fixed z-[100] h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-lf-blue bg-lf-blue-light/30"
           style={{ left: cursorPos.x, top: cursorPos.y }}

@@ -75,14 +75,14 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
 
       {/* Input bar */}
       <div className="flex items-center gap-2 border-t-[0.5px] border-cl-border bg-cl-surface px-4 py-3">
-        <div className="flex flex-1 items-center rounded-full border border-cl-border bg-white px-4 min-h-[44px]">
+        <div className="flex flex-1 items-center rounded-full border-2 border-cl-border bg-cl-surface px-4 min-h-[44px] focus-within:border-cl-accent transition-colors">
           <input
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
             placeholder="message..."
-            className="w-full bg-transparent text-[14px] text-black outline-none placeholder:text-cl-text-muted"
+            className="w-full bg-transparent text-base text-cl-text outline-none placeholder:text-cl-text-muted"
           />
         </div>
         <button
@@ -90,7 +90,7 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
           onClick={handleSend}
           className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-cl-accent shadow-[--shadow-card] active:opacity-90"
         >
-          <Send className="h-5 w-5 text-white" />
+          <Send className="h-5 w-5 text-cl-accent-text" />
         </button>
       </div>
     </div>

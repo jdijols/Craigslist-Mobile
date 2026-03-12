@@ -119,7 +119,7 @@ export function CategoryRow({
   return (
     <div
       className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-        collapsed ? "max-h-0" : "max-h-[36px]"
+        collapsed ? "max-h-0" : "max-h-[44px]"
       }`}
     >
       <div className="flex items-center">
@@ -141,7 +141,7 @@ export function CategoryRow({
                 onPointerUp={onLongPress ? () => handlePointerUp(name) : undefined}
                 onPointerLeave={onLongPress ? handlePointerCancel : undefined}
                 onClick={onLongPress ? undefined : () => handleSelect(name)}
-                className="shrink-0 px-2.5 pb-0 pt-1 outline-none min-h-[36px] flex items-end select-none"
+                className="shrink-0 px-2.5 pb-0 pt-1 outline-none min-h-[44px] flex items-end select-none"
               >
                 <span
                   className={`inline-flex items-center gap-0.5 border-b-2 pb-2.5 text-sm font-semibold transition-colors ${
@@ -158,7 +158,7 @@ export function CategoryRow({
           })}
         </div>
         {rightSlot && (
-          <div className="shrink-0 pr-5 flex items-center min-h-[36px]">
+          <div className="shrink-0 pr-5 flex items-center min-h-[44px]">
             {rightSlot}
           </div>
         )}

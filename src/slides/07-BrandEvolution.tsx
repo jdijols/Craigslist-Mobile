@@ -4,7 +4,7 @@ const kept = [
   {
     item: 'The lowercase "craigslist" wordmark',
     reason:
-      "Iconic. Universally recognized. No user need or business KPI improves by changing it.",
+      "Iconic. No user need or KPI improves by changing it.",
   },
   {
     item: "Purple as the primary brand color",
@@ -27,7 +27,7 @@ const changed = [
   {
     item: "Typography scale",
     what: "Clear Display / Title / Body / Caption scale using the platform's native type system.",
-    why: "CL currently has no type hierarchy. Users can't scan, can't distinguish headings from body.",
+    why: "CL has no type hierarchy. Users can't scan or distinguish headings from body.",
     kpi: "Scan speed → faster time-to-tap → browse-to-detail conversion",
   },
   {
@@ -39,7 +39,7 @@ const changed = [
   {
     item: "Touch target sizing",
     what: "All interactive elements meet iOS minimum 44pt touch targets.",
-    why: "Current CL uses text links as primary navigation — small, hard to tap, frustrating.",
+    why: "CL uses text links as navigation — small, hard to tap.",
     kpi: "Error rate → task completion → user satisfaction",
   },
   {
@@ -51,7 +51,7 @@ const changed = [
   {
     item: "Warm neutral backgrounds",
     what: "Off-white instead of pure white for background surfaces.",
-    why: "Reduces visual fatigue during extended browsing. Warm feel aligned with CL's community spirit.",
+    why: "Reduces visual fatigue. Warm feel matches CL's community spirit.",
     kpi: "Session duration (retention)",
   },
 ];

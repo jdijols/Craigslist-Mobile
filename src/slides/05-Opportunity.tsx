@@ -9,8 +9,8 @@ const feeCategories = [
 ];
 
 const opportunities = [
-  "No engagement feedback for sellers — they post and hope",
-  "No retention mechanics beyond saved searches — no notifications, no reason to come back daily",
+  "No engagement feedback for sellers — post and hope",
+  "No retention mechanics — no notifications, no reason to come back daily",
 ];
 
 export function OpportunitySlide() {
@@ -21,7 +21,7 @@ export function OpportunitySlide() {
           The Opportunity
         </p>
         <h2 className="mt-3 font-serif text-4xl text-lf-navy">
-          How Craigslist sustains itself — and where design fits
+          How CL makes money — and where design fits
         </h2>
         <div className="mt-4 h-px w-16 bg-lf-blue/25" />
 
@@ -29,12 +29,9 @@ export function OpportunitySlide() {
           {/* Left: Business model */}
           <div>
             <p className="text-sm leading-relaxed text-lf-body">
-              No ads. No data selling. Revenue comes from{" "}
-              <span className="font-semibold text-lf-navy">listing fees</span>{" "}
-              in specific categories, while ~99% of listings remain free. An
-              estimated{" "}
-              <span className="font-semibold text-lf-navy">$297M/year</span> on
-              roughly 50 employees.
+              No ads. No data selling.{" "}
+              <span className="font-semibold text-lf-navy">~$297M/year</span>{" "}
+              from listing fees, ~50 employees. 99% of listings are free.
             </p>
 
             <div className="mt-5 space-y-2">
@@ -82,8 +79,7 @@ export function OpportunitySlide() {
               ))}
             </div>
             <p className="mt-4 text-xs font-semibold text-lf-blue">
-              A redesigned buyer experience isn't just a UX improvement — it's
-              a revenue lever.
+              Better buyer UX isn't a nice-to-have — it's a revenue lever.
             </p>
           </div>
         </div>
@@ -115,10 +111,9 @@ export function OpportunitySlide() {
                 <span className="font-bold text-lf-navy">
                   The competitive reality:
                 </span>{" "}
-                Facebook Marketplace and OfferUp win CL's users with
-                photo-forward browsing, integrated profiles, and identity-backed
-                trust. CL has in-app chat, but most users default to the email
-                relay — the overall mobile experience still feels frozen in 2005.
+                Marketplace and OfferUp win CL's users with photos, profiles,
+                and in-app trust. CL's mobile experience still feels frozen in
+                2005.
               </p>
             </div>
           </div>

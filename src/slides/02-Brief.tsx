@@ -17,9 +17,8 @@ export function BriefSlide() {
         </h2>
         <div className="mt-6 h-px w-16 bg-lf-blue/25" />
         <p className="mt-6 text-lg leading-relaxed text-lf-body">
-          Craigslist has hired Livefront to redesign their mobile app and
-          requested that it follow modern design trends for native mobile.
-          We're starting with four core capabilities:
+          Redesign the craigslist iOS app with modern native patterns.
+          Four core capabilities to start:
         </p>
 
         <div className="mt-8 space-y-4">
@@ -37,9 +36,8 @@ export function BriefSlide() {
 
         <div className="mt-10 rounded-[1.5rem] border border-slide-border bg-slide-surface p-6 shadow-card">
           <p className="text-sm leading-relaxed text-lf-body">
-            Before opening Figma, we spent time understanding who uses
-            Craigslist, what they need, and how the platform sustains itself.
-            That research is the foundation for the work that follows.
+            Research-first. We studied CL's users, business model, and
+            competitive landscape before touching pixels.
           </p>
         </div>
       </div>

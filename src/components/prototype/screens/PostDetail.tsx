@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from "react";
+import { useState, useMemo, useRef, useLayoutEffect, useCallback } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   Star, MapPin, Clock, X, Phone, Mail, ExternalLink,
@@ -36,7 +36,6 @@ const HEADER_H = 112;
 const HANDLE_H = 24;
 const NAV_CLEARANCE = 60;
 const SWIPE_THRESHOLD = 30;
-const HANDOFF_THRESHOLD = 24;
 
 interface PostDetailProps {
   onNavigate?: (screen: ScreenId) => void;
@@ -55,33 +54,6 @@ export function PostDetail({
   variant: variantProp,
   listing,
 }: PostDetailProps) {
-  const debugLog = useCallback((payload: {
-    runId: string;
-    hypothesisId: string;
-    location: string;
-    message: string;
-    data: Record<string, unknown>;
-  }) => {
-    // #region agent log
-    fetch("http://127.0.0.1:7724/ingest/ad5c4552-52b9-43af-b958-c367076e4b10", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Debug-Session-Id": "13d690",
-      },
-      body: JSON.stringify({
-        sessionId: "13d690",
-        runId: payload.runId,
-        hypothesisId: payload.hypothesisId,
-        location: payload.location,
-        message: payload.message,
-        data: payload.data,
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-  }, []);
-
   const defaultMessage = "hi, i'm interested in your post!";
   const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -170,172 +142,12 @@ export function PostDetail({
     const maxDefault = h - CTA_H - HEADER_H;
     const initialSheetY = Math.min(allImagesBottom, maxDefault);
     sheetY.set(initialSheetY);
-    debugLog({
-      runId: "initial",
-      hypothesisId: "H1",
-      location: "PostDetail.tsx:useLayoutEffect",
-      message: "layout-and-snap-metrics",
-      data: {
-        containerH: h,
-        containerW: w,
-        chromeOff: co,
-        imagesCount: images.length,
-        allImagesBottom,
-        maxDefault,
-        initialSheetY,
-        imagesPadding: h - initialSheetY,
-      },
-    });
     setReady(true);
-  }, [sheetY, images.length, debugLog]);
-
-  // #region agent log — DOM inspection for icon/text visibility
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const container = containerRef.current;
-      if (!container) return;
-
-      const closeBtn = container.querySelector('button[aria-label="Close"]');
-      const closeSvg = closeBtn?.querySelector("svg");
-      const closePaths = closeSvg ? closeSvg.querySelectorAll("line, path") : [];
-
-      const badgeSpan = container.querySelector('span[class*="bg-black"]');
-
-      const navWrapper = container.querySelector(".z-30");
-
-      const scrim = container.querySelector(".z-10.bg-black");
-
-      const logData: Record<string, unknown> = {
-        containerExists: !!container,
-        containerRect: container?.getBoundingClientRect(),
-      };
-
-      if (navWrapper) {
-        const cs = getComputedStyle(navWrapper);
-        const r = (navWrapper as HTMLElement).getBoundingClientRect();
-        logData.navWrapper = {
-          rect: { top: r.top, left: r.left, width: r.width, height: r.height },
-          computedTop: cs.top,
-          computedZIndex: cs.zIndex,
-          computedDisplay: cs.display,
-          computedVisibility: cs.visibility,
-          computedOpacity: cs.opacity,
-          computedOverflow: cs.overflow,
-          computedPointerEvents: cs.pointerEvents,
-        };
-      } else {
-        logData.navWrapper = "NOT FOUND";
-      }
-
-      if (closeBtn) {
-        const cs = getComputedStyle(closeBtn);
-        const r = (closeBtn as HTMLElement).getBoundingClientRect();
-        logData.closeBtn = {
-          rect: { top: r.top, left: r.left, width: r.width, height: r.height },
-          computedBgColor: cs.backgroundColor,
-          computedColor: cs.color,
-          computedOpacity: cs.opacity,
-          computedVisibility: cs.visibility,
-          computedOverflow: cs.overflow,
-          innerHTML: (closeBtn as HTMLElement).innerHTML.substring(0, 300),
-        };
-      } else {
-        logData.closeBtn = "NOT FOUND";
-      }
-
-      if (closeSvg) {
-        const cs = getComputedStyle(closeSvg);
-        const r = closeSvg.getBoundingClientRect();
-        logData.closeSvg = {
-          rect: { top: r.top, left: r.left, width: r.width, height: r.height },
-          computedColor: cs.color,
-          computedStroke: cs.stroke,
-          computedFill: cs.fill,
-          computedWidth: cs.width,
-          computedHeight: cs.height,
-          computedOpacity: cs.opacity,
-          computedVisibility: cs.visibility,
-          childCount: closeSvg.childElementCount,
-          pathCount: closePaths.length,
-          outerHTML: closeSvg.outerHTML.substring(0, 500),
-        };
-      } else {
-        logData.closeSvg = "NOT FOUND";
-      }
-
-      if (badgeSpan) {
-        const cs = getComputedStyle(badgeSpan);
-        const r = (badgeSpan as HTMLElement).getBoundingClientRect();
-        logData.badge = {
-          rect: { top: r.top, left: r.left, width: r.width, height: r.height },
-          computedColor: cs.color,
-          computedBgColor: cs.backgroundColor,
-          computedFontSize: cs.fontSize,
-          computedOpacity: cs.opacity,
-          computedVisibility: cs.visibility,
-          textContent: (badgeSpan as HTMLElement).textContent,
-          innerHTML: (badgeSpan as HTMLElement).innerHTML.substring(0, 200),
-        };
-      } else {
-        logData.badge = "NOT FOUND";
-      }
-
-      if (scrim) {
-        const cs = getComputedStyle(scrim);
-        logData.scrim = {
-          computedOpacity: cs.opacity,
-          computedZIndex: cs.zIndex,
-          computedPointerEvents: cs.pointerEvents,
-        };
-      } else {
-        logData.scrim = "NOT FOUND";
-      }
-
-      const phoneScreen = container.closest(".phone-screen");
-      if (phoneScreen) {
-        const pcs = getComputedStyle(phoneScreen);
-        logData.phoneScreen = {
-          chromeOffset: pcs.getPropertyValue("--chrome-offset"),
-          colorClText: pcs.getPropertyValue("--color-cl-text"),
-          colorScheme: pcs.colorScheme,
-          prefersColorScheme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-        };
-      }
-
-      fetch("http://127.0.0.1:7724/ingest/ad5c4552-52b9-43af-b958-c367076e4b10", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "13d690" },
-        body: JSON.stringify({
-          sessionId: "13d690",
-          runId: "dom-inspect",
-          hypothesisId: "H1-H5",
-          location: "PostDetail.tsx:domInspectionEffect",
-          message: "floating-nav-and-badge-dom-state",
-          data: logData,
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [ready]);
-  // #endregion
+  }, [sheetY, images.length]);
 
   const snapTo = useCallback(
     (idx: number) => {
       const clamped = Math.max(0, Math.min(snapPoints.length - 1, idx));
-      debugLog({
-        runId: "initial",
-        hypothesisId: "H4",
-        location: "PostDetail.tsx:snapTo",
-        message: "snap-request",
-        data: {
-          requestedIdx: idx,
-          clampedIdx: clamped,
-          fromSnapIdx: snapIdx,
-          targetY: snapPoints[clamped],
-          currentY: sheetY.get(),
-        },
-      });
       setSnapIdx(clamped);
       animate(sheetY, snapPoints[clamped], {
         type: "spring",
@@ -343,7 +155,7 @@ export function PostDetail({
         stiffness: 300,
       });
     },
-    [snapPoints, sheetY, snapIdx, debugLog],
+    [snapPoints, sheetY, snapIdx],
   );
 
   /* ── Swipe detection on header ── */
@@ -436,22 +248,10 @@ export function PostDetail({
       if (isExpanded) return;
       const atBottom = isImagesAtBottom();
       if (e.deltaY > 0 && atBottom) {
-        const el = imagesRef.current;
-        const scrollTop = el?.scrollTop ?? -1;
-        const clientHeight = el?.clientHeight ?? -1;
-        const scrollHeight = el?.scrollHeight ?? -1;
-        const remaining = scrollHeight > 0 ? scrollHeight - (scrollTop + clientHeight) : -1;
-        debugLog({
-          runId: "initial",
-          hypothesisId: "H2",
-          location: "PostDetail.tsx:handleContainerWheel",
-          message: "wheel-triggered-magnet",
-          data: { deltaY: e.deltaY, atBottom, scrollTop, clientHeight, scrollHeight, remaining },
-        });
         snapTo(0);
       }
     },
-    [isExpanded, snapTo, isImagesAtBottom, debugLog],
+    [isExpanded, snapTo, isImagesAtBottom],
   );
 
   const handleContainerTouchStart = useCallback((e: React.TouchEvent) => {
@@ -463,98 +263,16 @@ export function PostDetail({
       if (isExpanded) return;
       const dy = imgTouchStartY.current - e.changedTouches[0].clientY;
       const atBottom = isImagesAtBottom();
-      const el = imagesRef.current;
-      const scrollTop = el?.scrollTop ?? -1;
-      const clientHeight = el?.clientHeight ?? -1;
-      const scrollHeight = el?.scrollHeight ?? -1;
-      const remaining = scrollHeight > 0 ? scrollHeight - (scrollTop + clientHeight) : -1;
-      debugLog({
-        runId: "initial",
-        hypothesisId: "H7",
-        location: "PostDetail.tsx:handleContainerTouchEnd",
-        message: "touch-end-decision",
-        data: {
-          dy,
-          threshold: SWIPE_THRESHOLD,
-          atBottom,
-          willSnap: dy > SWIPE_THRESHOLD && atBottom,
-          scrollTop,
-          clientHeight,
-          scrollHeight,
-          remaining,
-        },
-      });
       if (dy > SWIPE_THRESHOLD && atBottom) {
-        debugLog({
-          runId: "initial",
-          hypothesisId: "H3",
-          location: "PostDetail.tsx:handleContainerTouchEnd",
-          message: "touch-triggered-magnet",
-          data: { dy, threshold: SWIPE_THRESHOLD, atBottom, scrollTop, clientHeight, scrollHeight, remaining },
-        });
         snapTo(0);
       }
     },
-    [isExpanded, snapTo, isImagesAtBottom, debugLog],
+    [isExpanded, snapTo, isImagesAtBottom],
   );
 
-  const bottomProbeLoggedRef = useRef(false);
-  const nearBottomProbeLoggedRef = useRef(false);
   const handleImagesScroll = useCallback(() => {
-    const el = imagesRef.current;
-    if (!el) return;
-    const remaining = el.scrollHeight - (el.scrollTop + el.clientHeight);
-    if (!nearBottomProbeLoggedRef.current && remaining > 0 && remaining <= 40) {
-      const lastBtn = el.querySelector("button:last-of-type");
-      const lastBottomInContainer = lastBtn
-        ? (lastBtn as HTMLElement).offsetTop + (lastBtn as HTMLElement).offsetHeight - el.scrollTop + el.offsetTop
-        : null;
-      debugLog({
-        runId: "initial",
-        hypothesisId: "H6",
-        location: "PostDetail.tsx:handleImagesScroll",
-        message: "near-bottom-not-yet-bottom",
-        data: {
-          scrollTop: el.scrollTop,
-          clientHeight: el.clientHeight,
-          scrollHeight: el.scrollHeight,
-          remaining,
-          threshold: 4,
-          isAtBottomNow: remaining <= 4,
-          sheetTop: sheetY.get(),
-          lastBottomInContainer,
-          gapToSheetTop: lastBottomInContainer == null ? null : sheetY.get() - lastBottomInContainer,
-        },
-      });
-      nearBottomProbeLoggedRef.current = true;
-    }
-    if (!bottomProbeLoggedRef.current && remaining <= 24) {
-      const lastImg = el.querySelector("img:last-of-type");
-      const lastRect = lastImg?.getBoundingClientRect();
-      const containerRect = containerRef.current?.getBoundingClientRect();
-      const sheetTop = sheetY.get();
-      const gapToSheetTop =
-        lastRect && containerRect ? sheetTop - (lastRect.bottom - containerRect.top) : null;
-      debugLog({
-        runId: "initial",
-        hypothesisId: "H5",
-        location: "PostDetail.tsx:handleImagesScroll",
-        message: "near-bottom-geometry",
-        data: {
-          scrollTop: el.scrollTop,
-          clientHeight: el.clientHeight,
-          scrollHeight: el.scrollHeight,
-          remaining,
-          sheetTop,
-          lastImageBottomInContainer: lastRect && containerRect
-            ? lastRect.bottom - containerRect.top
-            : null,
-          gapToSheetTop,
-        },
-      });
-      bottomProbeLoggedRef.current = true;
-    }
-  }, [sheetY, debugLog]);
+    // Scroll handler for sheet magnet logic — no-op, magnet triggered by wheel/touch
+  }, []);
 
   return (
     <div
@@ -573,13 +291,13 @@ export function PostDetail({
         <button
           type="button"
           onClick={handleClose}
-          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px] outline-none active:opacity-90"
+          className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] outline-none active:opacity-90"
           aria-label="Close"
         >
-          <X className="h-5 w-5 text-[#111]" strokeWidth={2} />
+          <X className="h-5 w-5 text-cl-text" strokeWidth={2} />
         </button>
 
-        <div className="pointer-events-auto flex flex-row overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px]">
+        <div className="pointer-events-auto flex flex-row overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px]">
           <button
             type="button"
             onClick={() => toggleFavorite(effectiveListing)}
@@ -589,17 +307,17 @@ export function PostDetail({
             <Star
               className="h-5 w-5"
               strokeWidth={1.8}
-              stroke="#111111"
+              stroke="var(--color-cl-text)"
               fill={isFav ? "var(--color-cl-favorite)" : "transparent"}
             />
           </button>
           <button
             type="button"
             onClick={() => setShareOpen(true)}
-            className="flex h-10 w-10 items-center justify-center border-l border-black/10 outline-none active:opacity-90"
+            className="flex h-10 w-10 items-center justify-center border-l border-cl-border outline-none active:opacity-90"
             aria-label="Share"
           >
-            <ShareIcon className="h-[18px] w-[18px] text-[#111]" />
+            <ShareIcon className="h-[18px] w-[18px] text-cl-text" />
           </button>
         </div>
       </div>
@@ -627,12 +345,12 @@ export function PostDetail({
             <img
               src={src}
               alt={`${variant.title} ${i + 1}`}
-              className="block aspect-[4/3] w-full object-cover"
+              className="block w-full h-auto"
               loading={i === 0 ? "eager" : "lazy"}
               draggable={false}
             />
             {i === 0 && images.length > 1 && (
-              <span className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-medium" style={{ color: "#fff" }}>
+              <span className="absolute bottom-3 right-3 rounded-[0] bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white">
                 1 / {images.length}
               </span>
             )}
@@ -648,7 +366,7 @@ export function PostDetail({
 
       {/* ── Bottom sheet (swipe-to-snap, no drag-following) ── */}
       <motion.div
-        className="absolute inset-x-0 top-0 z-20 flex flex-col bg-cl-surface shadow-[0_-4px_20px_rgba(0,0,0,0.12)]"
+        className="absolute inset-x-0 top-0 z-20 flex flex-col bg-cl-surface shadow-[var(--shadow-sheet)]"
         style={{ y: sheetY, bottom: CTA_H, visibility: ready ? "visible" : "hidden" }}
       >
         {/* Header — swipe / scroll / click target (handle + title + price) */}
@@ -781,7 +499,7 @@ export function PostDetail({
       </motion.div>
 
       {/* ── Fixed CTA — always pinned to bottom, outside the sheet ── */}
-      <div className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-white px-4 pt-3 pb-[34px]">
+      <div className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3 pb-[34px]">
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -789,7 +507,7 @@ export function PostDetail({
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
             placeholder={defaultMessage}
-            className="h-11 min-w-0 flex-1 rounded-[--radius-button] border border-cl-border bg-white px-3 text-[14px] text-black outline-none placeholder:text-cl-text-muted focus:border-cl-accent"
+            className="h-11 min-w-0 flex-1 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 text-base text-cl-text outline-none placeholder:text-cl-text-muted focus:border-cl-accent transition-colors"
           />
           <button
             type="button"
@@ -797,7 +515,7 @@ export function PostDetail({
             className="flex h-11 shrink-0 items-center justify-center rounded-[--radius-button] bg-cl-accent px-4 outline-none active:opacity-90"
             aria-label="Send message"
           >
-            <span className="text-[14px] font-semibold text-white">send</span>
+            <span className="text-[14px] font-semibold text-cl-accent-text">send</span>
           </button>
         </div>
         <div className="mt-2 flex gap-2">

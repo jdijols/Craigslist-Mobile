@@ -45,10 +45,11 @@ interface AppPrototypeProps {
   postDetailVariant?: PostDetailVariantId;
   homeCategory?: string;
   homeSubcategory?: string;
+  homeSubcategoryDrawerOpen?: boolean;
   homeViewMode?: ViewMode;
 }
 
-export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCategory, homeSubcategory, homeViewMode }: AppPrototypeProps) {
+export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCategory, homeSubcategory, homeSubcategoryDrawerOpen, homeViewMode }: AppPrototypeProps) {
   const [settled, setSettled] = useState<ScreenId>(
     MODAL_SCREENS.has(screen) ? "home" : screen
   );
@@ -273,6 +274,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
             restoreSignal={restoreSignal}
             restoreDataRef={restoreDataRef}
             initialViewMode={homeViewMode}
+            initialSubcategoryDrawerOpen={homeSubcategoryDrawerOpen}
           />
         );
       }
@@ -347,6 +349,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
       homeResetSignal,
       restoreSignal,
       homeViewMode,
+      homeSubcategoryDrawerOpen,
     ],
   );
 
@@ -380,6 +383,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
                 restoreDataRef={restoreDataRef}
                 onScrollToTopRequest={() => setHomeResetSignal((s) => s + 1)}
                 initialViewMode={homeViewMode}
+                initialSubcategoryDrawerOpen={homeSubcategoryDrawerOpen}
               />
             </div>
 

@@ -7,7 +7,7 @@ import {
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, RotateCcw } from "lucide-react";
-import { DockNav } from "@/components/navigation";
+import { DockNav, type DockNavHandle } from "@/components/navigation";
 import { PhoneFrame, ScreenshotPlaceholder } from "@/components/layout";
 import { AppPrototype } from "@/components/prototype";
 import type { ScreenId, PrototypeStep } from "@/components/prototype";
@@ -52,6 +52,7 @@ export function Presentation({ slides }: PresentationProps) {
   const touchStartY = useRef<number | null>(null);
   const lastWheelEvent = useRef(0);
   const lastNavTime = useRef(0);
+  const dockNavRef = useRef<DockNavHandle | null>(null);
 
   const getStepCount = useCallback(
     (si: number) => slides[si]?.prototypeSteps?.length ?? 0,
@@ -101,6 +102,10 @@ export function Presentation({ slides }: PresentationProps) {
   const handlePrototypeNavigate = useCallback((screen: ScreenId) => {
     setInteractiveScreen(screen);
   }, []);
+
+  useEffect(() => {
+    dockNavRef.current?.focusActive();
+  }, [slideIndex]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -188,6 +193,7 @@ export function Presentation({ slides }: PresentationProps) {
   const postDetailVariant = currentStep?.postDetailVariant;
   const homeCategory = currentStep?.homeCategory;
   const homeSubcategory = currentStep?.homeSubcategory;
+  const homeSubcategoryDrawerOpen = currentStep?.homeSubcategoryDrawerOpen;
   const homeViewMode = currentStep?.homeViewMode;
 
   const animKey = `${currentSlide.id}-${stepIndex}`;
@@ -254,6 +260,7 @@ export function Presentation({ slides }: PresentationProps) {
                     postDetailVariant={postDetailVariant}
                     homeCategory={homeCategory}
                     homeSubcategory={homeSubcategory}
+                    homeSubcategoryDrawerOpen={homeSubcategoryDrawerOpen}
                     homeViewMode={homeViewMode}
                   />
                 )}
@@ -286,7 +293,7 @@ export function Presentation({ slides }: PresentationProps) {
         </button>
       </div>
 
-      <DockNav slides={slides} activeIndex={slideIndex} onSelect={goTo} />
+      <DockNav ref={dockNavRef} slides={slides} activeIndex={slideIndex} onSelect={goTo} />
     </div>
   );
 }

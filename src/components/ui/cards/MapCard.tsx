@@ -15,7 +15,7 @@ export function MapCard({ data, onClick }: MapCardProps) {
   const images = data.images ?? [data.image];
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLButtonElement>(null);
   const lastWheelEvent = useRef(0);
   const lastNavTime = useRef(0);
   const indexRef = useRef(0);

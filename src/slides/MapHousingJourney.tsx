@@ -11,33 +11,31 @@ function MapExploreText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        A user relocating to Minneapolis wants to understand rent prices
-        by neighborhood. They tap Housing on Home, then switch to the map
-        view — no specific listing in mind, just spatial context.
+        A user relocating to Minneapolis explores rent prices by
+        neighborhood. No specific listing — just spatial context.
       </p>
       <div className="mt-4 rounded-xl bg-lf-blue-bg px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-lf-blue">
           Who this serves
         </p>
         <p className="mt-1 text-xs leading-relaxed text-lf-body">
-          The <strong>Buyer without Intent</strong>: browsing geographically,
-          comparing neighborhoods, building a mental model of the market before
-          committing to a viewing.
+          <strong>Buyer without Intent</strong>: comparing neighborhoods,
+          building a mental model before committing.
         </p>
       </div>
 
       <div className="mt-8 space-y-5">
         {[
           {
-            title: "Pins and clusters",
+            title: "Dots for listings, favorites at a glance",
             detail:
-              "Individual listings show as pins; dense areas group into numbered clusters. Tapping a pin reveals a callout with price and photo — enough to decide whether to drill in.",
+              "Listings show as easy-to-see dots. Tap for price and photo preview. Favorites are apparent at a glance.",
             tag: "Discovery",
           },
           {
             title: "Spatial browsing",
             detail:
-              "Map view lets users compare neighborhoods at a glance — something text-list Craigslist fundamentally cannot offer. It turns the feed into geography.",
+              "Neighborhood comparison at a glance — something text lists can't offer.",
             tag: "Engagement",
           },
         ].map((a) => (
@@ -69,9 +67,8 @@ function HousingDetailText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        Tapping a pin opens the listing detail — the same Post Detail screen,
-        adapted for housing. Monthly rent replaces a one-time price, and the
-        description surfaces move-in details.
+        Same Post Detail screen, adapted for housing. Monthly rent replaces
+        one-time price.
       </p>
       <div className="mt-6 space-y-5">
         <div className="border-l-2 border-lf-blue/25 pl-4">
@@ -84,9 +81,8 @@ function HousingDetailText() {
             </span>
           </div>
           <p className="mt-1 text-xs leading-relaxed text-lf-body">
-            Post Detail adapts its content to the listing category. The layout
-            stays the same — photo, price, seller, reply CTA — but the
-            contextual details change. One pattern, every vertical.
+            Same layout across categories — photo, price, seller, reply CTA —
+            with contextual details per vertical.
           </p>
         </div>
         <div className="border-l-2 border-lf-blue/25 pl-4">
@@ -99,9 +95,8 @@ function HousingDetailText() {
             </span>
           </div>
           <p className="mt-1 text-xs leading-relaxed text-lf-body">
-            The sticky Reply CTA works identically for housing — the buyer
-            composes a message, the landlord receives it anonymized. The
-            conversion action is universal across categories.
+            Sticky Reply CTA works identically. Universal conversion action
+            across all categories.
           </p>
         </div>
       </div>

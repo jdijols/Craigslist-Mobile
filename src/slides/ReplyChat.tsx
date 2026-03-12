@@ -11,20 +11,17 @@ function ReplyCTAText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        Every buyer journey ends here: tapping Reply opens a compose sheet
-        where the user writes a message to the anonymized poster. This is
-        the action that turns browsing into a transaction — and the action
-        current Craigslist buries behind email.
+        Tapping Reply opens a compose sheet. The action that turns browsing
+        into a transaction — and the one CL currently buries behind email.
       </p>
       <div className="mt-4 rounded-xl bg-lf-blue-bg px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-lf-blue">
           Why in-app messaging matters
         </p>
         <p className="mt-1 text-xs leading-relaxed text-lf-body">
-          Keeping replies inside the app means the user stays engaged, the
-          seller gets notified instantly, and Craigslist retains visibility
-          into marketplace activity — a prerequisite for trust features,
-          moderation, and future monetization.
+          User stays engaged, seller gets instant notifications, and CL
+          retains visibility into marketplace activity — a prerequisite
+          for trust, moderation, and monetization.
         </p>
       </div>
 
@@ -33,13 +30,13 @@ function ReplyCTAText() {
           {
             title: "Anonymized identity",
             detail:
-              "Both sides communicate through anonymized handles. No email addresses are exposed until the users choose to share — privacy by default, as Craigslist users expect.",
+              "Both sides use anonymized handles. No emails exposed until users opt in. Privacy by default.",
             tag: "Trust",
           },
           {
             title: "Contextual pre-fill",
             detail:
-              "The reply sheet pre-fills with a natural opening message referencing the listing title. Reduces friction — the user just taps Send.",
+              "Pre-filled opening message referencing the listing. User just taps Send.",
             tag: "Conversion",
           },
         ].map((a) => (
@@ -71,10 +68,8 @@ function ChatThreadText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        After sending a reply, the conversation appears in the Chats tab.
-        Each thread is tied to a specific listing — context is never lost.
-        The seller sees the same thread on their end, anchored to their
-        My Listings dashboard.
+        Conversations live in the Chats tab, tied to their listing.
+        Context is never lost.
       </p>
 
       <div className="mt-8 space-y-5">
@@ -82,19 +77,19 @@ function ChatThreadText() {
           {
             title: "Listing-anchored threads",
             detail:
-              "Every thread references the listing it originated from. Tap the header to jump back to the post. Both sides always know what they're talking about.",
+              "Tap the thread header to jump back to the listing. Both sides always know what they're discussing.",
             tag: "Usability",
           },
           {
             title: "Chats tab as inbox",
             detail:
-              "All conversations — as buyer or seller — live in one place. Unread indicators and timestamps surface the most urgent threads. The tab badge tells you at a glance.",
+              "All conversations in one place. Unread indicators and timestamps surface urgent threads.",
             tag: "Retention",
           },
           {
             title: "Seller notification loop",
             detail:
-              "When a buyer replies, the seller is notified and the reply count on My Listings increments. The seller's response flows back to the buyer's Chats tab — a feedback loop that keeps both sides in the app.",
+              "Buyer replies notify the seller. Seller responds back to the buyer's Chats tab. A loop that keeps both sides in the app.",
             tag: "Engagement",
           },
         ].map((a) => (

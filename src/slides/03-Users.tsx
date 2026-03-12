@@ -150,11 +150,9 @@ export function UsersSlide() {
             <span className="font-bold text-lf-blue">
               The insight:
             </span>{" "}
-            Power users on both sides are repeat users with specific goals who
-            value efficiency — and they're the most likely to pay. Casual users
-            on both sides are occasional, driven by a momentary need, and need
-            the experience to be effortless. Every screen a buyer sees is also a
-            seller's listing on display.
+            Power users value efficiency and are most likely to pay.
+            Casual users need it effortless. Every screen a buyer sees
+            is a seller's listing on display.
           </p>
         </div>
       </div>

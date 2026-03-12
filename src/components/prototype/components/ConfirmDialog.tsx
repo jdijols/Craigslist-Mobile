@@ -55,41 +55,41 @@ export function ConfirmDialog({
 
           <motion.div
             key="confirm-dialog"
-            className="relative z-10 w-[270px] overflow-hidden rounded-[14px] bg-[#f2f2f7]/95 backdrop-blur-xl shadow-xl"
+            className="relative z-10 w-[270px] overflow-hidden rounded-[14px] bg-cl-bg-secondary/95 backdrop-blur-xl shadow-xl"
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.85 }}
             transition={DIALOG_SPRING}
           >
             <div className="px-4 pt-5 pb-4">
-              <p className="text-center text-[17px] font-semibold text-[#1c1c1e]">
+              <p className="text-center text-[17px] font-semibold text-cl-text">
                 {title}
               </p>
-              <p className="mt-1 text-center text-[13px] text-[#8e8e93] leading-[18px]">
+              <p className="mt-1 text-center text-[13px] text-cl-text-muted leading-[18px]">
                 {message}
               </p>
             </div>
 
-            <div className="border-t-[0.5px] border-[#c7c7cc]">
+            <div className="border-t-[0.5px] border-cl-border">
               <button
                 type="button"
                 onClick={() => {
                   onConfirm();
                   onClose();
                 }}
-                className={`flex w-full min-h-[44px] items-center justify-center outline-none active:bg-[#e5e5ea] ${
-                  destructive ? "text-[#ff3b30]" : "text-[#007aff]"
+                className={`flex w-full min-h-[44px] items-center justify-center outline-none active:bg-cl-active ${
+                  destructive ? "text-cl-destructive" : "text-cl-accent"
                 } text-[17px]`}
               >
                 {confirmLabel}
               </button>
             </div>
 
-            <div className="border-t-[0.5px] border-[#c7c7cc]">
+            <div className="border-t-[0.5px] border-cl-border">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex w-full min-h-[44px] items-center justify-center text-[17px] font-semibold text-[#007aff] outline-none active:bg-[#e5e5ea]"
+                className="flex w-full min-h-[44px] items-center justify-center text-[17px] font-semibold text-cl-accent outline-none active:bg-cl-active"
               >
                 cancel
               </button>

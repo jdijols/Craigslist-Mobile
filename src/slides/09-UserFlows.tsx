@@ -68,12 +68,11 @@ export function UserFlowsSlide() {
         </h2>
         <div className="mt-4 h-px w-16 bg-lf-blue/25" />
         <p className="mt-4 text-sm text-lf-body">
-          Each journey ends in one of the two actions that keep the marketplace
-          alive: a <span className="font-semibold text-lf-navy">reply</span>{" "}
-          (buyer-side conversion) or a{" "}
-          <span className="font-semibold text-lf-navy">post</span> (seller-side
-          conversion). The users we defined earlier drive these paths — from
-          intent-driven search to open exploration to posting on both sides.
+          Every journey ends in one of two actions:{" "}
+          <span className="font-semibold text-lf-navy">reply</span>{" "}
+          (buyer conversion) or{" "}
+          <span className="font-semibold text-lf-navy">post</span>{" "}
+          (seller conversion).
         </p>
 
         <div className="mt-8 space-y-6">

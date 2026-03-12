@@ -17,16 +17,16 @@ export function ThankYouSlide() {
         </h1>
         <div className="mt-5 h-px w-24 mx-auto bg-lf-blue/25" />
         <p className="mt-6 text-lg text-lf-secondary max-w-md mx-auto">
-          Happy to discuss next steps, priorities, or any questions you have
-          about the designs presented.
+          Let&rsquo;s schedule time to walk through the prototype and
+          discuss next steps.
         </p>
       </div>
       <div className="relative mt-4 text-center">
         <p className="text-sm font-semibold text-lf-blue">
-          Questions?
+          Ready to talk?
         </p>
         <p className="mt-1 text-xs text-lf-secondary">
-          Let’s talk
+          Let&rsquo;s set up a call
         </p>
       </div>
     </div>

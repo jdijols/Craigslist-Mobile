@@ -5,7 +5,7 @@ const exitVariants = {
   visible: { opacity: 1 },
   exit: {
     opacity: 0,
-    transition: { duration: 0.35, ease: "easeInOut" },
+    transition: { duration: 0.35, ease: "easeInOut" as const },
   },
 };
 
@@ -24,10 +24,10 @@ export function StandaloneCover() {
         >
           <div
             className="absolute inset-0 backdrop-blur-2xl"
-            style={{ backgroundColor: "rgba(249,250,251,0.88)" }}
+            style={{ backgroundColor: "var(--standalone-cover-bg)" }}
           />
 
-          <div className="relative z-10 flex w-full max-w-sm flex-col items-center px-8 py-16 text-center">
+          <div className="standalone-cover-content relative z-10 flex w-full max-w-sm flex-col items-center px-8 py-16 text-center">
             <img
               src="/assets/cl-icon.png"
               alt=""
@@ -40,7 +40,7 @@ export function StandaloneCover() {
               <span className="text-cl-purple-secondary">craigslist</span> app
             </h1>
 
-            <div className="mt-6 h-px w-10 bg-lf-navy/10" />
+            <div className="standalone-cover-divider mt-6 h-px w-10 bg-lf-navy/10" />
 
             <p className="mt-6 text-sm leading-relaxed text-lf-secondary">
               Thank you for taking the time to review this work. It's a
@@ -62,15 +62,15 @@ export function StandaloneCover() {
               Continue to Prototype
             </button>
 
-            <p className="mt-16 text-[11px] text-lf-secondary/60">
+            <p className="standalone-cover-footer mt-16 text-[11px] text-lf-secondary">
               Feedback and critiques are welcome
             </p>
-            <p className="mt-2 text-[11px] text-lf-secondary/50">
+            <p className="standalone-cover-footer mt-2 text-[11px] text-lf-secondary">
               <a
                 href="https://www.linkedin.com/in/jasondijols"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-lf-secondary/70 hover:text-lf-navy transition-colors"
+                className="hover:text-lf-navy transition-colors"
               >
                 Jason Dijols
               </a>
@@ -80,7 +80,7 @@ export function StandaloneCover() {
                 href="https://livefront.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-lf-secondary/70 hover:text-lf-navy transition-colors"
+                className="hover:text-lf-navy transition-colors"
               >
                 Livefront
               </a>

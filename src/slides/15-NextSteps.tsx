@@ -4,7 +4,7 @@ const nextSteps = [
   {
     icon: PenLine,
     title: "Posting & Managing",
-    detail: "Streamlined post creation with photo-first UX, category suggestions, and price guidance.",
+    detail: "Photo-first post creation with category suggestions and price guidance.",
     need: "Seller experience",
   },
   {
@@ -16,7 +16,7 @@ const nextSteps = [
   {
     icon: BadgeCheck,
     title: "Seller Verification",
-    detail: "Optional identity verification for enhanced trust signals. Builds confidence for higher-value transactions.",
+    detail: "Optional identity verification. Builds confidence for high-value transactions.",
     need: "Trust & safety",
   },
   {

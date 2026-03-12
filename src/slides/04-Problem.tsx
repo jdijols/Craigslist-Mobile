@@ -9,29 +9,28 @@ function HomeText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Home</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        The first screen users see looks and feels like a spreadsheet.
-        A plain-text category list with no imagery, no hierarchy, and
-        no sense of what&rsquo;s happening nearby.
+        The first screen is text-forward. We see an opportunity for more
+        imagery, clearer hierarchy, and a sense of what&rsquo;s nearby.
       </p>
 
       <div className="mt-8 space-y-5">
         {[
           {
-            title: "Plain text category drill-down",
+            title: "Category drill-down is text-heavy",
             detail:
-              "Two-panel text lists require multiple taps just to orient. No visual cues guide the eye or suggest what's popular.",
+              "Multiple taps to orient. We’d add visual cues to guide the eye.",
             tag: "Navigation",
           },
           {
-            title: "No images or visual hierarchy",
+            title: "Limited visual hierarchy",
             detail:
-              "Without icons, photos, or typographic weight, every category feels equally unimportant — nothing invites exploration.",
+              "Categories carry similar weight. We’d differentiate to invite exploration.",
             tag: "Visual Design",
           },
           {
-            title: "No personalization or local context",
+            title: "Room for personalization and local context",
             detail:
-              "Nothing reflects the user's location, history, or what's trending nearby. The experience is identical for every visitor.",
+              "Location, history, and trending could make the experience feel more relevant per visitor.",
             tag: "Engagement",
           },
         ].map((a) => (
@@ -61,29 +60,28 @@ function BrowseText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Browse</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        Exploring what&rsquo;s available should feel like window shopping.
-        Instead it feels like reading a spreadsheet &mdash; across five
-        different views that each leave out something important.
+        Browsing could feel more like window shopping. Today there are
+        several views — we’d unify them so each shows what matters most.
       </p>
 
       <div className="mt-8 space-y-5">
         {[
           {
-            title: "Photos are optional, not default",
+            title: "Photos could be more central",
             detail:
-              "The default list view shows no images at all. A gallery mode exists, but it's buried behind a hamburger menu → \"change view.\" The most important signal in marketplace browsing is treated as an advanced feature.",
+              "Default view is text-first. Gallery exists via the menu; we’d make imagery the default.",
             tag: "Visual Design",
           },
           {
-            title: "Five views, zero coherence",
+            title: "Views could be more consistent",
             detail:
-              "Text list, thumbnail list, gallery grid, map clusters — each shows different information, none shows enough. Users hop between modes trying to piece together what's available.",
+              "Each view shows different info. We’d align so users don’t have to hop to piece it together.",
             tag: "Discovery",
           },
           {
-            title: "Controls hide behind a menu",
+            title: "Filter and sort could be more visible",
             detail:
-              "Filtering, sorting, and switching views all require opening a dropdown from a hamburger icon. There's no persistent UI for the actions users need most while browsing.",
+              "They live in the hamburger menu. We’d surface them so they’re always at hand.",
             tag: "Usability",
           },
         ].map((a) => (
@@ -113,30 +111,29 @@ function SearchText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Search</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        When a user knows what they want, speed is everything. But
-        searching on craigslist means typing blind into a bare text
-        field &mdash; then scrolling through results that hide the
-        information needed to make a quick decision.
+        When users know what they want, speed matters. CL already offers
+        search help and save/history — we see room to surface them more
+        and to make results easier to scan.
       </p>
 
       <div className="mt-8 space-y-5">
         {[
           {
-            title: "No autocomplete or suggestions",
+            title: "Autocomplete and suggestions could be more prominent",
             detail:
-              "Users type into a plain text field with zero assistance. No trending terms, no category-aware suggestions, no recent searches to pick from.",
+              "They exist (see second screenshot). We’d surface them more and make them more helpful.",
             tag: "Efficiency",
           },
           {
-            title: "Results lack decision-making context",
+            title: "Results could show more at a glance",
             detail:
-              "Listings show a title and price but no distance, neighborhood, or condition. Users open every item just to determine if it's worth pursuing.",
+              "Title and price are there; distance, neighborhood, and condition would reduce taps to evaluate.",
             tag: "Information",
           },
           {
-            title: "No way to save or revisit a search",
+            title: "Saved search, alerts, and history could be easier to find",
             detail:
-              "There are no saved searches, no alerts, no history. Every search starts from scratch — even for users checking the same category daily.",
+              "All exist — save search, email/text alerts, history — but live in the hamburger. We’d give them a clearer home.",
             tag: "Retention",
           },
         ].map((a) => (
@@ -166,29 +163,29 @@ function ItemDetailText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Post Detail</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        Would you send $500 to this person based on what you see here?
-        Small photos, no seller context, and a reply flow that leaves the
-        app entirely — the moment trust matters most, the experience fails.
+        Post detail is where trust matters most. We see an opportunity:
+        larger photos, clearer seller context, and keeping the reply
+        flow inside the app.
       </p>
 
       <div className="mt-8 space-y-5">
         {[
           {
-            title: "Small, low-quality images",
+            title: "Photos could have more prominence",
             detail:
-              "Photos are the #1 trust signal in peer-to-peer commerce. Here they're cropped, tiny, and hard to evaluate.",
+              "Photos drive trust. We’d give them more space so buyers can evaluate at a glance.",
             tag: "Trust",
           },
           {
-            title: "No meaningful seller information",
+            title: "Seller context could be stronger",
             detail:
-              "No ratings, join date, response time, or listing history. Buyers have zero basis for evaluating the person behind the post.",
+              "Ratings, join date, or listing history would help buyers feel more confident.",
             tag: "Trust",
           },
           {
-            title: "Reply goes to email",
+            title: "Reply currently goes to email",
             detail:
-              "Tapping reply exits the app and opens a mailto link. The conversation leaves craigslist — and so does the user.",
+              "Tapping reply opens mailto. We’d keep the conversation in-app so both sides stay engaged.",
             tag: "Conversion",
           },
         ].map((a) => (

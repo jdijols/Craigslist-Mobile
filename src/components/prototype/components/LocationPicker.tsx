@@ -190,7 +190,7 @@ export function LocationPicker({
               closeAriaLabel="Close location picker"
             />
             <div className="px-4 pb-3 pt-0">
-              <div className="flex items-center gap-2.5 rounded-[--radius-button] border border-cl-border bg-white px-3 h-search-input">
+              <div className="flex items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input focus-within:border-cl-accent transition-colors">
                 <Search className="h-4 w-4 shrink-0 text-cl-text-muted" />
                 <input
                   ref={inputRef}
@@ -203,7 +203,7 @@ export function LocationPicker({
                   onFocus={handleInputFocus}
                   onKeyDown={handleKeyDown}
                   placeholder="search by city or zipcode"
-                  className="w-0 flex-1 bg-transparent text-[15px] text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
+                  className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
                 />
                 {query.length > 0 && (
                   <button
@@ -246,11 +246,11 @@ export function LocationPicker({
 
             <div className="absolute left-1/2 top-1/2 z-10 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white bg-cl-accent" />
 
-            <div className="absolute top-3 right-3 z-20 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[--radius-button] bg-white/80 shadow-md backdrop-blur-[6px]">
+            <div className="absolute top-3 right-3 z-20 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px]">
               <button
                 type="button"
                 onClick={handleLocate}
-                className="flex h-full w-full items-center justify-center outline-none"
+                className="flex h-full w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
                 aria-label="Use current location"
               >
                 <Navigation className="h-5 w-5 text-cl-text shrink-0 translate-x-[-2px] translate-y-[1px]" />
@@ -306,7 +306,7 @@ export function LocationPicker({
               onClick={handleApply}
               className="mt-2 flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90"
             >
-              <span className="text-[17px] font-semibold text-white">
+              <span className="text-[17px] font-semibold text-cl-accent-text">
                 apply
               </span>
             </button>

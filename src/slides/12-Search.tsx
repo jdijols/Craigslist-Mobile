@@ -9,18 +9,16 @@ function SearchText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Search</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        A user furnishing their new home searches for "mid-century dresser."
-        They know what they want — the app needs to get out of the way
-        and deliver results fast.
+        User searches "mid-century dresser." They know what they want —
+        the app gets out of the way.
       </p>
       <div className="mt-4 rounded-xl bg-lf-blue-bg px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-lf-blue">
           Who this serves
         </p>
         <p className="mt-1 text-xs leading-relaxed text-lf-body">
-          The <strong>Buyer with Intent</strong>: precise search, filters, and
-          repeat queries. Suggested categories and recent searches also support
-          casual buyers who open search without a specific term.
+          <strong>Buyer with Intent</strong>: precise search and filters.
+          Suggested categories also help casual browsers.
         </p>
       </div>
 
@@ -29,19 +27,19 @@ function SearchText() {
           {
             title: "Recent searches + suggested categories",
             detail:
-              "Recent searches acknowledge that users repeat queries (checking for new listings). Suggested categories help users who open search without a specific term.",
+              "Users repeat queries daily. Recent searches and suggested categories surface both.",
             tag: "Retention",
           },
           {
             title: "Cross-category results",
             detail:
-              'A query for "desk" surfaces results from Furniture, Free, and Services. Broadest possible view — search intent shouldn\'t be artificially constrained.',
+              '"Desk" surfaces results from Furniture, Free, and Services. No artificial constraints.',
             tag: "Discovery",
           },
           {
             title: "Shared card layout with Browse",
             detail:
-              "Visual consistency — users learn one scanning pattern. The difference between browse and search is the entry point, not the output.",
+              "Same cards as Browse. Users learn one scanning pattern.",
             tag: "System",
           },
         ].map((a) => (

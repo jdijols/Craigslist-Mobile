@@ -137,6 +137,14 @@
   color-scheme: light dark;
 }
 
+/* Standalone mobile: lock width, prevent resize, smooth touch */
+.standalone-prototype .phone-screen {
+  touch-action: manipulation;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  max-width: min(540px, 100vw);
+}
+
 .phone-screen * {
   font-family: "Inter", Arial, sans-serif;
 }
@@ -255,8 +263,8 @@
   gap: 6px;
 }
 
-/* Dark status bar — triggered by ImageViewer via data attribute */
-.phone-screen[data-dark-status-bar]::before {
+/* Dark status bar — triggered by ImageViewer via data attribute (presentation only) */
+.phone-bezel .phone-screen[data-dark-status-bar]::before {
   content: "";
   position: absolute;
   top: 0;

@@ -11,19 +11,16 @@ function PostDetailText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        This is where every buyer journey converges: the user decides whether
-        to reply. Every element serves one goal — give the buyer enough
-        confidence to contact the seller.
+        Every buyer journey converges here. One goal: give the buyer
+        enough confidence to contact the seller.
       </p>
       <div className="mt-4 rounded-xl bg-lf-blue-bg px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-lf-blue">
           Who this serves
         </p>
         <p className="mt-1 text-xs leading-relaxed text-lf-body">
-          <strong>Buyers</strong> (both intent-driven and casual): clear
-          price, location, and photos reduce friction to reply. The same
-          screen is the <strong>seller's</strong> listing at its best — trust
-          and conversion for both sides.
+          Clear price, location, and photos reduce friction to reply.
+          Also the <strong>seller's</strong> listing at its best.
         </p>
       </div>
 
@@ -32,19 +29,19 @@ function PostDetailText() {
           {
             title: "Sticky Reply CTA",
             detail:
-              "Contact action always visible, never scrolled away. Current CL buries the reply link and sends users to email. The sticky bar keeps the action accessible and the user in the app.",
+              "Always visible, never scrolled away. Current CL buries the reply link behind email.",
             tag: "Conversion",
           },
           {
             title: "Full-bleed image carousel",
             detail:
-              "Photos get the screen real estate they deserve. Trust that no amount of description text can match. Sellers' listings look their best.",
+              "Photos get the space they deserve. Trust no description text can match.",
             tag: "Trust",
           },
           {
             title: "Clear price + location hierarchy",
             detail:
-              "Price is the first thing a buyer wants to know. Location is the second (is this worth the trip?). Both are instantly scannable without reading the description.",
+              "Price first, location second. Both scannable without reading the description.",
             tag: "Usability",
           },
         ].map((a) => (

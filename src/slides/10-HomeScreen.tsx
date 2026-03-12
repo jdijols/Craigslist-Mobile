@@ -9,18 +9,16 @@ function HomeScreenText() {
       <h2 className="mt-3 font-serif text-4xl text-lf-navy">Home Screen</h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        The entry point for every user journey: searching for furniture,
-        exploring housing on the map, browsing jobs, or posting a listing.
-        It surfaces the capabilities without forcing a choice.
+        Entry point for every journey. Surfaces capabilities without
+        forcing a choice.
       </p>
       <div className="mt-4 rounded-xl bg-lf-blue-bg px-4 py-3">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-lf-blue">
           Who this serves
         </p>
         <p className="mt-1 text-xs leading-relaxed text-lf-body">
-          All four user types: Buyer with Intent (search bar), Buyer without
-          Intent (categories), and entry to Post for both Private
-          and Commercial sellers.
+          All four user types: search for intent buyers, categories for
+          browsers, post entry for sellers.
         </p>
       </div>
 
@@ -29,19 +27,19 @@ function HomeScreenText() {
           {
             title: "Search bar prominence",
             detail:
-              "The #1 action on CL is searching. Here it's the first thing you see. Fast access for intent-driven buyers — reduces drop-off.",
+              "The #1 action on CL is searching. Here it's the first thing you see.",
             tag: "Conversion",
           },
           {
             title: "Photo-forward card feed",
             detail:
-              "Photo-forward cards create browsability CL completely lacks. Gives users a reason to open the app without a specific goal.",
+              "Browsability CL completely lacks. A reason to open the app without a specific goal.",
             tag: "Retention",
           },
           {
             title: "Revenue-informed category ordering",
             detail:
-              "For Sale and Jobs positioned first — highest traffic and listing fee revenue. Revenue-contributing categories get the most prominent real estate.",
+              "For Sale and Jobs first — highest traffic and fee revenue.",
             tag: "Business",
           },
         ].map((a) => (
@@ -73,9 +71,8 @@ function HomeToCategoryText() {
       </h2>
       <div className="mt-4 h-px w-16 bg-lf-blue/25" />
       <p className="mt-4 text-sm text-lf-body">
-        Tapping a category on the Home screen pushes to the browse view.
-        The iOS push transition maintains spatial context — the user always
-        knows where they came from.
+        Tapping a category pushes to the browse view. iOS push transition
+        maintains spatial context.
       </p>
       <div className="mt-6 space-y-5">
         <div className="border-l-2 border-lf-blue/25 pl-4">
@@ -88,8 +85,7 @@ function HomeToCategoryText() {
             </span>
           </div>
           <p className="mt-1 text-xs leading-relaxed text-lf-body">
-            No multi-level category tree. The brief specifies one level of depth —
-            the user picks a top-level category and filters from there.
+            No multi-level tree. One category, then filter.
           </p>
         </div>
       </div>
@@ -99,5 +95,10 @@ function HomeToCategoryText() {
 
 export const homeScreenSteps: PrototypeStep[] = [
   { screen: "home", text: <HomeScreenText /> },
-  { screen: "home", text: <HomeToCategoryText /> },
+  {
+    screen: "home",
+    text: <HomeToCategoryText />,
+    homeCategory: "for sale",
+    homeSubcategoryDrawerOpen: true,
+  },
 ];

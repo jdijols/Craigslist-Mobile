@@ -16,7 +16,7 @@ interface TabBarProps {
 
 export function TabBar({ activeTab, onNavigate }: TabBarProps) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 z-30 flex h-[72px] border-t-[0.5px] border-cl-border bg-white pb-[21px]">
+    <div className="absolute bottom-0 left-0 right-0 z-30 flex h-[72px] border-t-[0.5px] border-cl-border bg-cl-surface pb-[21px]">
       {tabs.map((tab) => {
         const active = tab.id === activeTab;
         return (

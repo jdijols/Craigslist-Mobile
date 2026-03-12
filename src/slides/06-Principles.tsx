@@ -4,10 +4,10 @@ const principles = [
     metricLabel: "more views with photos",
     title: "Images earn trust",
     description:
-      "Photos of real items, posted by real people, are the most powerful signal on CL. Make them large, prominent, and central. When a listing has good photos, the design should let them shine.",
+      "Real photos are CL's most powerful trust signal. Make them large, prominent, and central.",
     dataPoints: [
-      "Listings with at least one photo get ~2x more views on peer marketplaces (eBay)",
-      "Facebook Marketplace passed 1B monthly users with an entirely photo-forward browse experience — CL's #1 competitor won on images",
+      "Listings with photos get ~2x more views on peer marketplaces (eBay)",
+      "FB Marketplace passed 1B users with a photo-forward browse experience",
     ],
     source: "Trust gap (Slide 4), competitive loss to photo-first platforms (Slide 5)",
   },
@@ -16,7 +16,7 @@ const principles = [
     metricLabel: "users lost per extra step",
     title: "Every tap should feel intentional",
     description:
-      "Current CL requires too many taps and each one leads somewhere unpredictable. Navigation should be shallow, actions obvious, and the user should always know where they are.",
+      "Too many taps to unpredictable places. Shallow navigation, obvious actions, clear wayfinding.",
     dataPoints: [
       "Each additional step in a mobile funnel drops ~20% of users (Baymard Institute)",
     ],
@@ -27,7 +27,7 @@ const principles = [
     metricLabel: "of seller value depends on buyers",
     title: "Serve both sides of the marketplace",
     description:
-      "A beautiful listing card serves the buyer (scannable) AND the seller (their item looks appealing). Design decisions should be evaluated from both perspectives. Our four user types guide where we optimize: efficiency for power users, effortless simplicity for casual users.",
+      "A good listing card serves both sides: scannable for buyers, appealing for sellers. Efficiency for power users, simplicity for casual ones.",
     dataPoints: [
       "0% of revenue comes from buyers, but 100% of seller value depends on them",
     ],
@@ -38,9 +38,9 @@ const principles = [
     metricLabel: "monthly visits, unchanged UI",
     title: "Familiar, not foreign",
     description:
-      "The redesign should feel like Craigslist grew up, not like it became a different product. Preserve the simplicity and directness. Discard the datedness.",
+      "CL should feel like it grew up — not like it became a different product.",
     dataPoints: [
-      "500M monthly visits despite zero visual updates in ~20 years — the brand has earned loyalty that shouldn't be discarded",
+      "500M monthly visits despite zero visual updates in ~20 years — loyalty earned, not to be discarded",
     ],
     source: "Brief's guidance to modernize, not rebrand",
   },

@@ -8,7 +8,7 @@ const benchmarks = [
       "Horizontally scrollable category chips for one-tap filtering",
     ],
     relevance:
-      "CL's home is a text wall. Airbnb proves that search prominence + visual cards + chip-based filtering dramatically improve discovery.",
+      "CL's home is a text wall. Search prominence + visual cards + chip filtering drive discovery.",
   },
   {
     app: "FB Marketplace",
@@ -19,7 +19,7 @@ const benchmarks = [
       "Category-driven browsing with hyper-local relevance",
     ],
     relevance:
-      "CL's closest direct competitor. Marketplace proves that structured listing forms, media-first uploads, and local filtering drive engagement in peer-to-peer commerce.",
+      "CL's closest competitor. Structured forms, media-first uploads, and local filtering drive commerce.",
   },
   {
     app: "eBay",
@@ -30,7 +30,7 @@ const benchmarks = [
       "Persistent saved searches with push alerts for new matches",
     ],
     relevance:
-      "CL's search is bare-bones. eBay demonstrates how predictive search, smart filtering, and saved-search alerts keep buyers engaged and accelerate transactions across high-volume marketplaces.",
+      "CL's search is bare-bones. Predictive search, smart filters, and saved-search alerts keep buyers engaged.",
   },
   {
     app: "Zillow",
@@ -41,7 +41,7 @@ const benchmarks = [
       "Seamless transition between list and map views for spatial discovery",
     ],
     relevance:
-      "CL housing and rental listings lack spatial context. Zillow proves that map-driven discovery and information-rich detail pages are essential for high-consideration categories that represent major revenue verticals.",
+      "CL listings lack spatial context. Map-driven discovery and rich detail pages are essential for high-consideration categories.",
   },
 ];
 
