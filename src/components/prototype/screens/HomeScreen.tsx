@@ -152,7 +152,29 @@ export function HomeScreen({
   const lastScrollTop = useRef(0);
   const collapsedRef = useRef(false);
   const scrollCooldown = useRef(0);
+  const prevHeaderCollapsed = useRef<boolean | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
+
+  const CATEGORY_ROW_HEIGHT = 44;
+
+  useLayoutEffect(() => {
+    if (prevHeaderCollapsed.current === null) {
+      prevHeaderCollapsed.current = headerCollapsed;
+      return;
+    }
+    const el = contentScrollRef.current;
+    if (!el) return;
+    const wasCollapsed = prevHeaderCollapsed.current;
+    prevHeaderCollapsed.current = headerCollapsed;
+    scrollCooldown.current = Date.now() + 350;
+    if (wasCollapsed && !headerCollapsed) {
+      el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, el.scrollTop + CATEGORY_ROW_HEIGHT);
+      lastScrollTop.current = el.scrollTop;
+    } else if (!wasCollapsed && headerCollapsed) {
+      el.scrollTop = Math.max(0, el.scrollTop - CATEGORY_ROW_HEIGHT);
+      lastScrollTop.current = el.scrollTop;
+    }
+  }, [headerCollapsed]);
 
   const scrollPositionsRef = useRef<Record<string, number>>({});
   const prevViewKeyRef = useRef<string | null>(null);
@@ -168,6 +190,7 @@ export function HomeScreen({
     const restore = scrollPositionsRef.current[viewKey] ?? 0;
     collapsedRef.current = false;
     setHeaderCollapsed(false);
+    prevHeaderCollapsed.current = false;
     lastScrollTop.current = restore;
     scrollCooldown.current = Date.now() + 150;
     if (el) el.scrollTop = restore;

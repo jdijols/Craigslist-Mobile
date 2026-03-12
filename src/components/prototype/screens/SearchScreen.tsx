@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo, type UIEvent } from "react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback, useMemo, type UIEvent } from "react";
 import {
   Search as SearchIcon,
   Bookmark,
@@ -76,10 +76,33 @@ export function SearchScreen({
 
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
 
+  const contentScrollRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const collapsedRef = useRef(false);
   const scrollCooldown = useRef(0);
+  const prevHeaderCollapsed = useRef<boolean | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
+
+  const CATEGORY_ROW_HEIGHT = 44;
+
+  useLayoutEffect(() => {
+    if (prevHeaderCollapsed.current === null) {
+      prevHeaderCollapsed.current = headerCollapsed;
+      return;
+    }
+    const el = contentScrollRef.current;
+    if (!el) return;
+    const wasCollapsed = prevHeaderCollapsed.current;
+    prevHeaderCollapsed.current = headerCollapsed;
+    scrollCooldown.current = Date.now() + 350;
+    if (wasCollapsed && !headerCollapsed) {
+      el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, el.scrollTop + CATEGORY_ROW_HEIGHT);
+      lastScrollTop.current = el.scrollTop;
+    } else if (!wasCollapsed && headerCollapsed) {
+      el.scrollTop = Math.max(0, el.scrollTop - CATEGORY_ROW_HEIGHT);
+      lastScrollTop.current = el.scrollTop;
+    }
+  }, [headerCollapsed]);
 
   const isTyping = draft.trim().length > 0;
 
@@ -314,6 +337,7 @@ export function SearchScreen({
 
       {/* Content area */}
       <div
+        ref={contentScrollRef}
         className={`flex-1 overflow-y-auto overscroll-contain scrollbar-none pb-[72px] ${contentIsEmpty ? "bg-cl-bg" : "bg-cl-surface"}`}
         onScroll={handleContentScroll}
       >
