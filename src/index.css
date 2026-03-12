@@ -98,21 +98,21 @@ body {
 
   /* Apply dark tokens globally so prototype (with or without phone frame) and status bar inherit */
   :root {
-    --status-bar-bg: #1C1C1E;
+    --status-bar-bg: #000000;
     --color-cl-purple: #AD6FF5;
     --color-cl-purple-secondary: #AD6FF5;
     --color-cl-purple-light: #AD6FF5;
     --color-cl-bg: #000000;
-    --color-cl-surface: #1C1C1E;
+    --color-cl-surface: #000000;
     --color-cl-border: #38383A;
     --color-cl-text: #F5F5F7;
-    --color-cl-text-muted: #94949A;
+    --color-cl-text-muted: #78787E;
     --color-cl-accent: #AD6FF5;
     --color-cl-price: #F5F5F7;
-    --color-cl-bg-secondary: #2C2C2E;
+    --color-cl-bg-secondary: #1A1A1C;
     --color-cl-destructive: #E57373;
     --color-cl-favorite: #FACC15;
-    --color-cl-active: #3a3a3e;
+    --color-cl-active: #2E2E32;
     --color-cl-accent-text: #000000;
 
     --color-cl-map-bg: #1a1a1e;
@@ -124,8 +124,8 @@ body {
     --color-cl-map-highway: #3a3a3e;
     --color-cl-map-label: #808088;
 
-    --color-cl-overlay-bg: rgba(44, 44, 46, 0.92);
-    --color-cl-overlay-bg-light: rgba(44, 44, 46, 0.80);
+    --color-cl-overlay-bg: rgba(0, 0, 0, 0.92);
+    --color-cl-overlay-bg-light: rgba(0, 0, 0, 0.80);
 
     --shadow-card: 0 3px 12px rgba(0, 0, 0, 0.3);
     --shadow-elevated: 0 6px 24px rgba(0, 0, 0, 0.5);

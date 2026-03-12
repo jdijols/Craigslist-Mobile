@@ -57,9 +57,6 @@ import {
 
 const CHIP_LABELS = ["all CL", ...categoryData.map((c) => c.name.toLowerCase())];
 
-/** Height of the category row when expanded; used for scroll compensation when header collapses/expands. */
-const CATEGORY_ROW_HEIGHT_PX = 44;
-
 function chipLabelToCategoryId(label: string): string {
   const cat = categoryData.find((c) => c.name.toLowerCase() === label);
   return cat?.id ?? label;
@@ -269,8 +266,7 @@ export function HomeScreen({
 
   const handleContentScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     const now = Date.now();
-    const el = e.currentTarget;
-    const scrollTop = el.scrollTop;
+    const scrollTop = e.currentTarget.scrollTop;
 
     if (now < scrollCooldown.current) {
       lastScrollTop.current = scrollTop;
@@ -289,22 +285,13 @@ export function HomeScreen({
       collapsedRef.current = true;
       setHeaderCollapsed(true);
       scrollCooldown.current = now + 400;
-      // Compensate scroll so content doesn’t jump when category row collapses (Twitter-style)
-      const next = Math.max(0, scrollTop - CATEGORY_ROW_HEIGHT_PX);
-      lastScrollTop.current = next;
-      el.scrollTop = next;
     } else if (delta < -6 && collapsedRef.current) {
       collapsedRef.current = false;
       setHeaderCollapsed(false);
       scrollCooldown.current = now + 400;
-      // Compensate scroll when category row expands
-      const maxScroll = el.scrollHeight - el.clientHeight;
-      const next = Math.min(maxScroll, scrollTop + CATEGORY_ROW_HEIGHT_PX);
-      lastScrollTop.current = next;
-      el.scrollTop = next;
     }
 
-    lastScrollTop.current = el.scrollTop;
+    lastScrollTop.current = scrollTop;
   }, []);
 
   const chipLabels = useMemo(

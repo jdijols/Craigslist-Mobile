@@ -117,12 +117,12 @@ export function CategoryRow({
   }, []);
 
   return (
-    <div
-      className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-        collapsed ? "max-h-0" : "max-h-[44px]"
-      }`}
-    >
-      <div className="flex items-center">
+    <div className="h-[44px] overflow-hidden shrink-0">
+      <div
+        className={`flex min-h-[44px] items-center transition-transform duration-300 ease-in-out ${
+          collapsed ? "-translate-y-full pointer-events-none" : "translate-y-0"
+        }`}
+      >
         <div
           ref={rowRef}
           className="flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain pl-1.5 pr-2 scrollbar-none"
