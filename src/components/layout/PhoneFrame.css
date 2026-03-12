@@ -41,12 +41,8 @@
   transform: scale(var(--scale));
   transform-origin: top left;
 
-  background: linear-gradient(
-    145deg,
-    #2a2a2e 0%,
-    #1c1c1e 40%,
-    #141416 100%
-  );
+  /* Match screen surface so transparent bezel-overlay reveals a seamless frame */
+  background: var(--color-cl-surface, #ffffff);
   border-radius: var(--corner-outer);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
@@ -68,7 +64,7 @@
   top: 160px;
   width: 3px;
   height: 64px;
-  background: linear-gradient(180deg, #3a3a3c, #2c2c2e);
+  background: transparent;
   border-radius: 0 2px 2px 0;
   z-index: 40;
   overflow: hidden;
@@ -81,9 +77,9 @@
   top: 130px;
   width: 3px;
   height: 36px;
-  background: linear-gradient(180deg, #3a3a3c, #2c2c2e);
+  background: transparent;
   border-radius: 2px 0 0 2px;
-  box-shadow: 0 60px 0 #2c2c2e, 0 96px 0 #2c2c2e;
+  box-shadow: 0 60px 0 transparent, 0 96px 0 transparent;
   z-index: 40;
   overflow: hidden;
 }
@@ -95,9 +91,25 @@
   position: absolute;
   inset: 0;
   border-radius: var(--corner-outer);
-  box-shadow: inset 0 0 0 var(--bezel) #1c1c1e;
+  box-shadow: inset 0 0 0 var(--bezel) transparent;
   z-index: 35;
   pointer-events: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .phone-bezel {
+    background: var(--color-cl-surface, #ffffff);
+  }
+  .phone-bezel::before {
+    background: transparent;
+  }
+  .phone-bezel::after {
+    background: transparent;
+    box-shadow: 0 60px 0 transparent, 0 96px 0 transparent;
+  }
+  .bezel-overlay {
+    box-shadow: inset 0 0 0 var(--bezel) transparent;
+  }
 }
 
 /* Dynamic Island */
@@ -125,7 +137,6 @@
   left: var(--bezel);
   right: var(--bezel);
   bottom: var(--bezel);
-  padding-top: var(--safe-area-top);
   background: var(--color-cl-surface, #ffffff);
   border-radius: var(--corner-inner);
   overflow: hidden;
@@ -137,8 +148,10 @@
   color-scheme: light dark;
 }
 
-/* Standalone mobile: lock width, prevent resize, smooth touch */
+/* Standalone mobile: lock width, prevent resize, smooth touch.
+   Use env() for safe area so header can extend into notch/Dynamic Island region. */
 .standalone-prototype .phone-screen {
+  --safe-area-top: env(safe-area-inset-top, 44px);
   touch-action: manipulation;
   min-height: 100dvh;
   min-height: -webkit-fill-available;

@@ -12,6 +12,7 @@ interface ChatThreadProps {
 export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
   const [draft, setDraft] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const headerPaddingTop = 44;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -27,7 +28,9 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
   return (
     <div className="flex h-full flex-col bg-cl-bg-secondary">
       {/* Header */}
-      <div className="flex h-header-bar items-center gap-1 border-b-[0.5px] border-cl-border bg-cl-surface px-2">
+      <div className="absolute top-0 left-0 right-0 z-10 border-b-[0.5px] border-cl-border bg-cl-surface">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+        <div className="flex h-header-bar items-center gap-1 px-2">
         <button
           type="button"
           onClick={() => onNavigate?.("chat")}
@@ -44,10 +47,15 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
             {thread.listingCategory}{thread.listingSubcategory ? ` › ${thread.listingSubcategory}` : ""}
           </p>
         </div>
+        </div>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-none">
+      <div
+        ref={scrollRef}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-none"
+        style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}
+      >
         {thread.messages.map((msg) => (
           <div
             key={msg.id}

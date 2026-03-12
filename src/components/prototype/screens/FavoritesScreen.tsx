@@ -87,9 +87,13 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
     return result;
   }, [favorites, activeSort, activeDistance, minPrice, maxPrice, selectedLocation]);
 
+  const headerPaddingTop = 44;
+
   return (
-    <div className="relative flex h-full flex-col">
-      <div className="flex h-header-bar items-center border-b-[0.5px] border-cl-border bg-cl-surface px-4">
+    <div className="relative h-full">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+        <div className="flex h-header-bar items-center px-4">
         <span className="text-[17px] font-semibold text-cl-text">favorites</span>
         <div className="flex flex-1 justify-end">
           <button
@@ -101,10 +105,12 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
             <Search className="h-6 w-6 text-cl-text" strokeWidth={1.8} />
           </button>
         </div>
+        </div>
       </div>
 
+      <div className="absolute inset-0 flex flex-col">
       {filteredFavorites.length === 0 && favorites.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center px-6 pt-32">
+        <div className="flex flex-1 flex-col items-center px-6" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 48}px)` }}>
           <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
             <Star className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
           </div>
@@ -116,11 +122,11 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
       ) : (
         <>
           {isMapView ? (
-            <div className="flex-1 min-h-0 flex flex-col pb-[72px]">
+            <div className="flex-1 min-h-0 flex flex-col pb-[72px]" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
               <MapView listings={filteredFavorites} onOpenListing={onOpenListing} />
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto overscroll-contain pb-24 scrollbar-none" onScroll={handleOverlayScroll}>
+            <div className="flex-1 overflow-y-auto overscroll-contain pb-24 scrollbar-none" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }} onScroll={handleOverlayScroll}>
               <div className="flex items-center justify-between px-4 py-2">
                 <p className="text-left text-[13px] font-medium text-cl-text">
                   {filteredFavorites.length} results
@@ -214,6 +220,7 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
           </div>
         </>
       )}
+      </div>
 
       {/* Confirm reset favorites */}
       <ConfirmDialog

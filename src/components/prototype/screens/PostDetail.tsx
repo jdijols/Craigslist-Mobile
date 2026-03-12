@@ -36,6 +36,9 @@ const HEADER_H = 112;
 const HANDLE_H = 24;
 const NAV_CLEARANCE = 60;
 const SWIPE_THRESHOLD = 30;
+/** Space reserved at top for overlay buttons (status bar + gap + button height). Sheet must top below this. */
+const OVERLAY_RESERVED_TOP = 96; /* 44 (safe-area) + 12 (gap) + 40 (button h-10) */
+const OVERLAY_GAP = 12; /* gap between overlay bottom and sheet top when expanded */
 
 interface PostDetailProps {
   onNavigate?: (screen: ScreenId) => void;
@@ -115,15 +118,17 @@ export function PostDetail({
   const [containerH, setContainerH] = useState(700);
   const [containerW, setContainerW] = useState(390);
   const [chromeOff, setChromeOff] = useState(47);
+  const [modalExtendsUp, setModalExtendsUp] = useState(0);
 
   const snapPoints = useMemo(() => {
-    const fullSnap = chromeOff + NAV_CLEARANCE;
+    const overlayBottom = OVERLAY_RESERVED_TOP + modalExtendsUp;
+    const fullSnap = Math.max(chromeOff + NAV_CLEARANCE, overlayBottom + OVERLAY_GAP);
     const allImagesBottom = chromeOff + Math.round(containerW * 0.75) * images.length;
     const maxDefault = containerH - CTA_H - HEADER_H;
     const defaultSnap = Math.min(allImagesBottom, maxDefault);
     const collapsedSnap = containerH - CTA_H - HANDLE_H;
     return [fullSnap, defaultSnap, collapsedSnap];
-  }, [containerH, containerW, chromeOff, images.length]);
+  }, [containerH, containerW, chromeOff, modalExtendsUp, images.length]);
 
   const imagesPadding = containerH - snapPoints[1];
 
@@ -134,9 +139,14 @@ export function PostDetail({
     const w = el.clientWidth;
     const parsed = parseInt(getComputedStyle(el).paddingTop, 10);
     const co = Number.isNaN(parsed) ? 47 : parsed;
+    const me = parseInt(
+      getComputedStyle(el).getPropertyValue("--modal-extends-up").trim() || "0",
+      10
+    );
     setContainerH(h);
     setContainerW(w);
     setChromeOff(co);
+    setModalExtendsUp(Number.isNaN(me) ? 0 : me);
 
     const allImagesBottom = co + Math.round(w * 0.75) * images.length;
     const maxDefault = h - CTA_H - HEADER_H;
@@ -278,7 +288,6 @@ export function PostDetail({
     <div
       ref={containerRef}
       className="relative flex h-full flex-col overflow-hidden bg-black"
-      style={{ paddingTop: "var(--chrome-offset)" }}
       onWheel={handleContainerWheel}
       onTouchStart={handleContainerTouchStart}
       onTouchEnd={handleContainerTouchEnd}
@@ -286,7 +295,7 @@ export function PostDetail({
       {/* ── Floating glass navigation ── */}
       <div
         className="pointer-events-none absolute left-4 right-4 z-30 flex items-start justify-between"
-        style={{ top: "calc(var(--chrome-offset) + 12px)" }}
+        style={{ top: "calc(var(--safe-area-top) + 12px + var(--modal-extends-up, 0px))" }}
       >
         <button
           type="button"

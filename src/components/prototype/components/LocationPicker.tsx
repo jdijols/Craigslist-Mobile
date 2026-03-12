@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Navigation, MapPin, Loader2 } from "lucide-react";
 import type { MapRef } from "react-map-gl/maplibre";
 import { useOverlayPortal } from "../../layout/OverlayPortal";
-import { SheetHeader } from "../../ui/SheetHeader";
+import { FullScreenDrawer } from "./FullScreenDrawer";
 import { SPRING_SHEET } from "../transitions";
 import { StaticMapLayer, MAP_ZOOM } from "./StaticMapLayer";
 import {
@@ -166,6 +166,69 @@ export function LocationPicker({
     [results, handleSelectResult],
   );
 
+  const headerContent = (
+    <div className="flex items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input focus-within:border-cl-accent transition-colors">
+      <Search className="h-4 w-4 shrink-0 text-cl-text-muted" />
+      <input
+        ref={inputRef}
+        type="text"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setShowResults(true);
+        }}
+        onFocus={handleInputFocus}
+        onKeyDown={handleKeyDown}
+        placeholder="search by city or zipcode"
+        className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
+      />
+      {query.length > 0 && (
+        <button
+          type="button"
+          onClick={() => {
+            setQuery("");
+            setShowResults(false);
+            inputRef.current?.focus();
+          }}
+          className="flex shrink-0 items-center justify-center rounded-full bg-cl-text-muted/80 p-[2px] outline-none active:opacity-70"
+          aria-label="Clear text"
+        >
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            className="text-white"
+          >
+            <path
+              d="M4 4l6 6M10 4l-6 6"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+
+  const bottomSlot = (
+    <>
+      <p className="text-center text-[13px] font-medium text-cl-text">
+        {selected.captionName} · {miles} mile radius
+      </p>
+      <button
+        type="button"
+        onClick={handleApply}
+        className="mt-2 flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90"
+      >
+        <span className="text-[17px] font-semibold text-cl-accent-text">
+          apply
+        </span>
+      </button>
+    </>
+  );
+
   const content = (
     <AnimatePresence>
       {open && (
@@ -181,63 +244,15 @@ export function LocationPicker({
             if (openRef.current) inputRef.current?.focus();
           }}
         >
-          <div className="shrink-0" style={{ height: "var(--chrome-offset)" }} />
-
-          <div className="shrink-0 border-b-[0.5px] border-cl-border bg-cl-surface">
-            <SheetHeader
-              title="location"
-              onClose={onClose}
-              closeAriaLabel="Close location picker"
-            />
-            <div className="px-4 pb-3 pt-0">
-              <div className="flex items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input focus-within:border-cl-accent transition-colors">
-                <Search className="h-4 w-4 shrink-0 text-cl-text-muted" />
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setShowResults(true);
-                  }}
-                  onFocus={handleInputFocus}
-                  onKeyDown={handleKeyDown}
-                  placeholder="search by city or zipcode"
-                  className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
-                />
-                {query.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQuery("");
-                      setShowResults(false);
-                      inputRef.current?.focus();
-                    }}
-                    className="flex shrink-0 items-center justify-center rounded-full bg-cl-text-muted/80 p-[2px] outline-none active:opacity-70"
-                    aria-label="Clear text"
-                  >
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      className="text-white"
-                    >
-                      <path
-                        d="M4 4l6 6M10 4l-6 6"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
+          <FullScreenDrawer
+            title="location"
+            onClose={onClose}
+            closeAriaLabel="Close location picker"
+            headerContent={headerContent}
+            bottomSlot={bottomSlot}
+          >
           {/* Map + search results overlay */}
-          <div className="relative flex-1 overflow-hidden">
+          <div className="relative h-full overflow-hidden">
             <StaticMapLayer
               mapRef={mapRef}
               center={{ longitude: effectiveLocation.lng, latitude: effectiveLocation.lat }}
@@ -296,21 +311,7 @@ export function LocationPicker({
               </div>
             )}
           </div>
-
-          <div className="flex flex-col border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3 pb-[34px]">
-            <p className="text-center text-[13px] font-medium text-cl-text">
-              {selected.captionName} · {miles} mile radius
-            </p>
-            <button
-              type="button"
-              onClick={handleApply}
-              className="mt-2 flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90"
-            >
-              <span className="text-[17px] font-semibold text-cl-accent-text">
-                apply
-              </span>
-            </button>
-          </div>
+          </FullScreenDrawer>
         </motion.div>
       )}
     </AnimatePresence>

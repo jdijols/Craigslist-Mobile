@@ -106,6 +106,19 @@ export function SearchScreen({
 
   const isTyping = draft.trim().length > 0;
 
+  // Reset header to expanded when switching views (matches HomeScreen behavior on category change)
+  const prevIsTypingRef = useRef(isTyping);
+  const prevActiveTabRef = useRef(activeTab);
+  useLayoutEffect(() => {
+    if (prevIsTypingRef.current !== isTyping || prevActiveTabRef.current !== activeTab) {
+      collapsedRef.current = false;
+      setHeaderCollapsed(false);
+      prevIsTypingRef.current = isTyping;
+      prevActiveTabRef.current = activeTab;
+    }
+  }, [isTyping, activeTab]);
+  const headerPaddingTop = isTyping ? 44 : (headerCollapsed ? 44 : 88);
+
   const handleContentScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
     const now = Date.now();
     const scrollTop = e.currentTarget.scrollTop;
@@ -264,9 +277,10 @@ export function SearchScreen({
   }
 
   return (
-    <div className="flex h-full flex-col bg-cl-bg">
-      {/* Header */}
-      <div className="bg-cl-surface border-b-[0.5px] border-cl-border">
+    <div className="relative h-full bg-cl-bg">
+      {/* Header — safe-area filler covers status bar region, no negative offset so no clipping */}
+      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
         <div className="flex h-header-bar items-center gap-2 px-4">
           <div
             className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input cursor-text focus-within:border-cl-accent transition-colors"
@@ -335,10 +349,11 @@ export function SearchScreen({
         )}
       </div>
 
-      {/* Content area */}
+      {/* Content area — full height from top, padding-top reserves space for header */}
       <div
         ref={contentScrollRef}
-        className={`flex-1 overflow-y-auto overscroll-contain scrollbar-none pb-[72px] ${contentIsEmpty ? "bg-cl-bg" : "bg-cl-surface"}`}
+        className={`absolute inset-0 overflow-y-auto overscroll-contain scrollbar-none pb-[72px] ${contentIsEmpty ? "bg-cl-bg" : "bg-cl-surface"}`}
+        style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}
         onScroll={handleContentScroll}
       >
         {isTyping ? (
@@ -403,7 +418,7 @@ export function SearchScreen({
             ) : (
               <>
                 {/* Empty state hero */}
-                <div className="flex flex-col items-center px-6 pt-[92px]">
+                <div className="flex flex-col items-center px-6 pt-12">
                   <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
                     <SearchIcon className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
                   </div>
@@ -443,7 +458,7 @@ export function SearchScreen({
         ) : (
           <>
             {saved.length === 0 ? (
-              <div className="flex flex-col items-center px-6 pt-[92px]">
+              <div className="flex flex-col items-center px-6 pt-12">
                 <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
                   <Bookmark className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
                 </div>

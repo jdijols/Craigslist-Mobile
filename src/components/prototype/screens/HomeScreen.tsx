@@ -383,10 +383,13 @@ export function HomeScreen({
     [activeCategory, activeSubcategory],
   );
 
+  const headerPaddingTop = headerCollapsed ? 44 : 88;
+
   return (
-    <div className="relative flex h-full flex-col">
-      {/* Header */}
-      <div className="bg-cl-surface border-b-[0.5px] border-cl-border">
+    <div className="relative h-full">
+      {/* Header — safe-area filler covers status bar region, no negative offset so no clipping */}
+      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
         {/* Locator / search row */}
         <div className="flex h-header-bar items-center gap-3 pl-1.5 pr-4">
           <button
@@ -434,9 +437,11 @@ export function HomeScreen({
         />
       </div>
 
-      {/* Content area */}
+      {/* Content area — full height from top, padding-top reserves space for header */}
+      <div className="absolute inset-0">
       {searchTerm ? (
         <SearchResultsContent
+          headerPaddingTop={headerPaddingTop}
           searchTerm={searchTerm}
           activeCategory={activeCategory}
           activeSubcategory={activeSubcategory}
@@ -460,6 +465,7 @@ export function HomeScreen({
           onContentScroll={handleContentScroll}
           scrollRef={contentScrollRef}
           locationName={locationName}
+          headerPaddingTop={headerPaddingTop}
         />
       ) : (
         <CategoryContent
@@ -486,6 +492,7 @@ export function HomeScreen({
           hasActiveSort={hasActiveSort}
           onFilterReset={handleFilterReset}
           headerCollapsed={headerCollapsed}
+          headerPaddingTop={headerPaddingTop}
           onRestoreHeader={() => {
             if (collapsedRef.current) {
               collapsedRef.current = false;
@@ -495,6 +502,7 @@ export function HomeScreen({
           scrollRef={contentScrollRef}
         />
       )}
+      </div>
 
       {/* ── Persistent overlay buttons (visible in category + search) ── */}
       {showOverlay && (
@@ -664,6 +672,7 @@ function CuratedFeed({
   onContentScroll,
   scrollRef,
   locationName,
+  headerPaddingTop = 88,
 }: {
   onNavigate?: (screen: ScreenId) => void;
   onOpenListing?: (listing: ListingData) => void;
@@ -672,6 +681,7 @@ function CuratedFeed({
   onContentScroll: (e: React.UIEvent<HTMLDivElement>) => void;
   scrollRef?: React.RefObject<HTMLDivElement | null>;
   locationName: string;
+  headerPaddingTop?: number;
 }) {
   const handleCardClick = (d: ListingData) => {
     if (d.linkType === "subcategory" && d.browseCategory && d.browseSubcategory) {
@@ -683,10 +693,11 @@ function CuratedFeed({
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain pt-4 pb-20 space-y-4 scrollbar-none"
+        className="flex-1 overflow-y-auto overscroll-contain pb-20 space-y-4 scrollbar-none"
+        style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 16}px)` }}
         onScroll={onContentScroll}
       >
         <CollectionSection title={`available jobs near ${locationName}`}>
@@ -790,6 +801,7 @@ function CategoryContent({
   hasActiveSort: _hasActiveSort,
   onFilterReset,
   headerCollapsed,
+  headerPaddingTop,
   onRestoreHeader,
   scrollRef,
 }: {
@@ -813,6 +825,7 @@ function CategoryContent({
   hasActiveSort: boolean;
   onFilterReset: () => void;
   headerCollapsed: boolean;
+  headerPaddingTop: number;
   onRestoreHeader: () => void;
   scrollRef?: React.RefObject<HTMLDivElement | null>;
 }) {
@@ -943,9 +956,9 @@ function CategoryContent({
   const emptyLabel = activeSubcategory ?? activeCategory;
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden">
+    <div className="absolute inset-0 flex flex-col overflow-hidden">
       {isEmpty ? (
-        <div className="flex flex-1 flex-col items-center px-6 pt-[92px]">
+        <div className="flex flex-1 flex-col items-center px-6" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 48}px)` }}>
           <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
             <Search className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
           </div>
@@ -1002,7 +1015,7 @@ function CategoryContent({
         <>
           {/* Content – map or listing cards */}
           {isMapView ? (
-            <div className="flex-1 min-h-0 flex flex-col pb-[72px]">
+            <div className="flex-1 min-h-0 flex flex-col pb-[72px]" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
               <MapView
                 listings={listings}
                 onOpenListing={onOpenListing}
@@ -1016,6 +1029,7 @@ function CategoryContent({
             <div
               ref={scrollRef}
               className="flex-1 overflow-y-auto overscroll-contain px-4 pb-20 scrollbar-none"
+              style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}
               onScroll={(e) => { onContentScroll(e); onOverlayScroll(e); }}
               onClick={handleBackgroundTap}
             >
@@ -1062,9 +1076,9 @@ function CategoryContent({
 
           {/* ── Persistent button overlay ── */}
 
-          {/* Top-right: Navigate (map only) */}
+          {/* Top-right: Navigate (map only) — inside map: full header height + gap */}
           {isMapView && (
-            <div className={`absolute top-3 right-3 z-20 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}>
+            <div className={`absolute right-3 z-20 flex h-10 w-10 items-center justify-center overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`} style={{ top: `calc(var(--safe-area-top) + ${headerPaddingTop}px + 12px)` }}>
               <button
                 type="button"
                 onClick={handleLocateOnMap}
@@ -1098,6 +1112,7 @@ function SearchResultsContent({
   minPrice,
   maxPrice,
   viewMode = "thumb",
+  headerPaddingTop = 88,
   scrollRef,
 }: {
   searchTerm: string;
@@ -1112,6 +1127,7 @@ function SearchResultsContent({
   minPrice: string;
   maxPrice: string;
   viewMode?: ViewMode;
+  headerPaddingTop?: number;
   scrollRef?: React.RefObject<HTMLDivElement | null>;
 }) {
   const { selectedLocation, setSelectedLocation, updateLocationCoords } = useLocation();
@@ -1187,7 +1203,7 @@ function SearchResultsContent({
 
   if (results.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center px-6 pt-[92px] bg-cl-bg">
+      <div className="absolute inset-0 flex flex-col items-center px-6 bg-cl-bg" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 48}px)` }}>
         <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
           <Search className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
         </div>
@@ -1203,9 +1219,9 @@ function SearchResultsContent({
   }
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden bg-cl-surface">
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-cl-surface">
       {viewMode === "map" ? (
-        <div className="flex-1 min-h-0 flex flex-col pb-[72px]">
+        <div className="flex-1 min-h-0 flex flex-col pb-[72px]" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
           <MapView
             listings={results}
             onOpenListing={onOpenListing}
@@ -1219,6 +1235,7 @@ function SearchResultsContent({
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto overscroll-contain px-4 pb-20 scrollbar-none"
+          style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}
           onScroll={(e) => { onContentScroll(e); onOverlayScroll(e); }}
         >
           <ResultsCaption>

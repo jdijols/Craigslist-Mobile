@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Camera, Check } from "lucide-react";
-import { SheetHeader } from "../../ui/SheetHeader";
+import { FullScreenDrawer } from "../components/FullScreenDrawer";
 import type { ScreenId } from "../types";
 
 const CATEGORIES = ["for sale", "housing", "jobs", "services", "community", "gigs"];
@@ -29,13 +29,24 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
   };
 
   return (
-    <div className="flex h-full flex-col bg-cl-surface" style={{ paddingTop: "var(--chrome-offset)" }}>
-      <SheetHeader
-        title="new post"
-        onClose={handleClose}
-        className="border-b-[0.5px] border-cl-border"
-      />
-
+    <FullScreenDrawer
+      title="new post"
+      onClose={handleClose}
+      bottomSlot={
+        !published ? (
+          <button
+            type="button"
+            onClick={handlePublish}
+            disabled={!title.trim()}
+            className="flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90 disabled:opacity-50"
+          >
+            <span className="text-[17px] font-semibold text-cl-accent-text">
+              publish
+            </span>
+          </button>
+        ) : undefined
+      }
+    >
       {published ? (
         <div className="flex flex-1 flex-col items-center justify-center px-6">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
@@ -47,8 +58,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
           </p>
         </div>
       ) : (
-        <>
-          <div className="flex-1 overflow-y-auto overscroll-contain scrollbar-none">
+        <div className="h-full overflow-y-auto overscroll-contain scrollbar-none">
             {/* Photo picker */}
             <div className="mx-4 mt-4 rounded-[--radius-card] border-2 border-dashed border-cl-border bg-cl-surface p-6 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
@@ -120,22 +130,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
               </div>
             </div>
           </div>
-
-          {/* Publish CTA */}
-          <div className="flex flex-col border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3 pb-[34px]">
-            <button
-              type="button"
-              onClick={handlePublish}
-              disabled={!title.trim()}
-              className="flex w-full min-h-[48px] items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] outline-none active:opacity-90 disabled:opacity-50"
-            >
-              <span className="text-[17px] font-semibold text-cl-accent-text">
-                publish
-              </span>
-            </button>
-          </div>
-        </>
       )}
-    </div>
+    </FullScreenDrawer>
   );
 }

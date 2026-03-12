@@ -66,9 +66,13 @@ export function MyListings({ onNavigate }: MyListingsProps) {
     setConfirmOpen(true);
   }, []);
 
+  const headerPaddingTop = 44;
+
   return (
-    <div className="relative flex h-full flex-col">
-      <div className="flex h-header-bar items-center border-b-[0.5px] border-cl-border bg-cl-surface px-4">
+    <div className="relative h-full">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+        <div className="flex h-header-bar items-center px-4">
         <span className="text-[17px] font-semibold text-cl-text">account</span>
         <div className="flex flex-1 justify-end">
           <button
@@ -80,9 +84,10 @@ export function MyListings({ onNavigate }: MyListingsProps) {
             <Search className="h-6 w-6 text-cl-text" strokeWidth={1.8} />
           </button>
         </div>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto overscroll-contain overflow-x-hidden pb-24 scrollbar-none">
+      <div className="absolute inset-0 overflow-y-auto overscroll-contain overflow-x-hidden pb-24 scrollbar-none" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
         {/* Profile card */}
         <div className="mx-4 mt-4 rounded-[--radius-card] border border-cl-border bg-cl-surface p-4 shadow-[--shadow-card]">
           <div className="flex items-center gap-3">

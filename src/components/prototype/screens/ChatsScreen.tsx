@@ -12,9 +12,13 @@ export function ChatsScreen({ onNavigate, onOpenThread }: ChatsScreenProps) {
   const threads = useChatThreads();
   const hasThreads = threads.length > 0;
 
+  const headerPaddingTop = 44;
+
   return (
-    <div className="flex h-full flex-col">
-      <div className="flex h-header-bar items-center border-b-[0.5px] border-cl-border bg-cl-surface px-4">
+    <div className="relative h-full">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
+        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+        <div className="flex h-header-bar items-center px-4">
         <span className="text-[17px] font-semibold text-cl-text">chats</span>
         <div className="flex flex-1 justify-end">
           <button
@@ -26,10 +30,12 @@ export function ChatsScreen({ onNavigate, onOpenThread }: ChatsScreenProps) {
             <Search className="h-6 w-6 text-cl-text" strokeWidth={1.8} />
           </button>
         </div>
+        </div>
       </div>
 
+      <div className="absolute inset-0 flex flex-col">
       {hasThreads ? (
-        <div className="flex-1 overflow-y-auto overscroll-contain scrollbar-none">
+        <div className="flex-1 overflow-y-auto overscroll-contain scrollbar-none" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
           {threads.map((thread) => (
             <button
               key={thread.id}
@@ -75,7 +81,7 @@ export function ChatsScreen({ onNavigate, onOpenThread }: ChatsScreenProps) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center px-6 pt-32">
+        <div className="flex flex-1 flex-col items-center px-6" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 48}px)` }}>
           <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card-lg] bg-cl-accent/10">
             <MessageCircle className="h-6 w-6 text-cl-accent" strokeWidth={1.8} aria-hidden />
           </div>
@@ -85,6 +91,7 @@ export function ChatsScreen({ onNavigate, onOpenThread }: ChatsScreenProps) {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }

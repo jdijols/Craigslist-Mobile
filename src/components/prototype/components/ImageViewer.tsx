@@ -244,10 +244,10 @@ export function ImageViewer({ images, initialIndex = 0, onClose }: ImageViewerPr
     >
       {/* Top overlay */}
       <div
-        className={`pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 transition-opacity duration-200 ${
+        className={`pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-between px-4 transition-opacity duration-200 ${
           overlaysVisible ? "opacity-100" : "opacity-0"
         }`}
-        style={{ top: "var(--chrome-offset)" }}
+        style={{ top: "calc(var(--safe-area-top) + 12px + var(--modal-extends-up, 0px))" }}
       >
         <button
           type="button"

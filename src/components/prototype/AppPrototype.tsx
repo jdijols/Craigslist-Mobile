@@ -398,7 +398,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
                 key={`${settled}-${screen}`}
                 initial={{ x: isPush ? "100%" : 0 }}
                 animate={{ x: isPush ? 0 : "100%" }}
-                transition={{ duration: 0.05, ease: "easeOut" }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 onAnimationComplete={() => setSettled(screen)}
                 className="absolute inset-0 z-10"
                 style={isPop ? { pointerEvents: "none" } : undefined}
@@ -414,8 +414,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
           {isModal && screen === "create-post" && (
             <motion.div
               key="modal-create-post"
-              className="absolute left-0 right-0 bottom-0 z-50 flex flex-col bg-cl-surface overflow-hidden"
-              style={{ top: "calc(var(--chrome-offset) * -1)" }}
+              className="absolute inset-0 z-50 flex flex-col bg-cl-surface overflow-hidden"
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
@@ -432,7 +431,12 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
             <motion.div
               key="modal-post-detail"
               className="absolute left-0 right-0 bottom-0 z-50 flex flex-col bg-cl-surface overflow-hidden"
-              style={{ top: "calc(var(--chrome-offset) * -1)" }}
+              style={
+                {
+                  top: "calc(var(--chrome-offset) * -1)",
+                  "--modal-extends-up": "var(--chrome-offset)",
+                } as React.CSSProperties
+              }
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
