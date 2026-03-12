@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useStatusBarColorFromElement } from "@/contexts/StatusBarColorContext";
 
 const exitVariants = {
   visible: { opacity: 1 },
@@ -11,6 +12,7 @@ const exitVariants = {
 
 export function StandaloneCover() {
   const [visible, setVisible] = useState(true);
+  const statusBarRef = useStatusBarColorFromElement();
 
   return (
     <AnimatePresence>
@@ -23,6 +25,7 @@ export function StandaloneCover() {
           exit="exit"
         >
           <div
+            ref={visible ? statusBarRef : undefined}
             className="absolute inset-0 backdrop-blur-2xl"
             style={{ backgroundColor: "var(--standalone-cover-bg)" }}
           />

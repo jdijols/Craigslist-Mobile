@@ -85,7 +85,9 @@ export function SearchScreen({
 
   const handleContentScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
     const now = Date.now();
-    const scrollTop = e.currentTarget.scrollTop;
+    const el = e.currentTarget;
+    const scrollTop = el.scrollTop;
+    const categoryRowHeight = 44;
 
     if (now < scrollCooldown.current) {
       lastScrollTop.current = scrollTop;
@@ -104,13 +106,20 @@ export function SearchScreen({
       collapsedRef.current = true;
       setHeaderCollapsed(true);
       scrollCooldown.current = now + 400;
+      const next = Math.max(0, scrollTop - categoryRowHeight);
+      lastScrollTop.current = next;
+      el.scrollTop = next;
     } else if (delta < -6 && collapsedRef.current) {
       collapsedRef.current = false;
       setHeaderCollapsed(false);
       scrollCooldown.current = now + 400;
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      const next = Math.min(maxScroll, scrollTop + categoryRowHeight);
+      lastScrollTop.current = next;
+      el.scrollTop = next;
     }
 
-    lastScrollTop.current = scrollTop;
+    lastScrollTop.current = el.scrollTop;
   }, []);
 
   useEffect(() => {

@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { Camera, Image, Check } from "lucide-react";
+import { Camera, Check } from "lucide-react";
 import { SheetHeader } from "../../ui/SheetHeader";
 import type { ScreenId } from "../types";
-
-const PLACEHOLDER_PHOTO =
-  "https://images.unsplash.com/photo-1696453424699-f6ebbe24c28a?w=400&h=400&fit=crop&auto=format&q=80";
 
 const CATEGORIES = ["for sale", "housing", "jobs", "services", "community", "gigs"];
 
@@ -14,9 +11,9 @@ interface CreatePostProps {
 }
 
 export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
-  const [title, setTitle] = useState("standing desk – adjustable height");
-  const [price, setPrice] = useState("180");
-  const [category, setCategory] = useState("for sale");
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState(CATEGORIES[0]);
   const [published, setPublished] = useState(false);
 
   const handleClose = () => {
@@ -67,19 +64,6 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
 
             {/* Photo thumbnails */}
             <div className="mx-4 mt-3 flex gap-2">
-              <img
-                src={PLACEHOLDER_PHOTO}
-                alt="Standing desk"
-                className="h-16 w-16 rounded-[--radius-card] object-cover border border-cl-border"
-              />
-              {[2, 3].map((n) => (
-                <div
-                  key={n}
-                  className="flex h-16 w-16 items-center justify-center rounded-[--radius-card] border border-cl-border bg-cl-surface"
-                >
-                  <Image className="h-5 w-5 text-cl-border" />
-                </div>
-              ))}
               <div className="flex h-16 w-16 items-center justify-center rounded-[--radius-card] border border-dashed border-cl-border">
                 <span className="text-lg text-cl-text-muted">+</span>
               </div>
@@ -130,8 +114,8 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
               </div>
               <div className="rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
                 <span className="text-[11px] text-cl-text-muted">location</span>
-                <p className="mt-0.5 text-[15px] text-cl-text">
-                  minneapolis (auto-detected)
+                <p className="mt-0.5 text-[15px] text-cl-text-muted">
+                  —
                 </p>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { X } from "lucide-react";
+import { useStatusBarColorFromElement } from "@/contexts/StatusBarColorContext";
 
 interface ImageViewerProps {
   images: string[];
@@ -42,6 +43,8 @@ export function ImageViewer({ images, initialIndex = 0, onClose }: ImageViewerPr
   useEffect(() => {
     return () => { if (tapTimerRef.current) clearTimeout(tapTimerRef.current); };
   }, []);
+
+  const statusBarRef = useStatusBarColorFromElement();
 
   useEffect(() => {
     const phoneScreen = rootRef.current?.closest(".phone-screen");
@@ -232,7 +235,13 @@ export function ImageViewer({ images, initialIndex = 0, onClose }: ImageViewerPr
   }, [goTo, onClose]);
 
   return (
-    <div ref={rootRef} className="absolute inset-0 z-50 flex flex-col bg-black">
+    <div
+      ref={(el) => {
+        (rootRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+        statusBarRef(el);
+      }}
+      className="absolute inset-0 z-50 flex flex-col bg-black"
+    >
       {/* Top overlay */}
       <div
         className={`pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 transition-opacity duration-200 ${
