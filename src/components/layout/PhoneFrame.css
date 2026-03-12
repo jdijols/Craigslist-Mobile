@@ -41,8 +41,8 @@
   transform: scale(var(--scale));
   transform-origin: top left;
 
-  /* Match screen surface so transparent bezel-overlay reveals a seamless frame */
-  background: var(--color-cl-surface, #ffffff);
+  /* Dark bezel (iPhone-style) — visible on both light and dark slide backgrounds */
+  background: var(--color-phone-bezel, #1d1d1f);
   border-radius: var(--corner-outer);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.08),
@@ -97,9 +97,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .phone-bezel {
-    background: var(--color-cl-surface, #ffffff);
-  }
+  /* Bezel stays dark in both modes for visibility */
   .phone-bezel::before {
     background: transparent;
   }
@@ -132,6 +130,7 @@
 .phone-screen {
   --safe-area-top: 44px;
   --chrome-offset: 47px;
+  --post-detail-chrome-offset: var(--chrome-offset);
   position: absolute;
   top: var(--bezel);
   left: var(--bezel);
@@ -149,9 +148,12 @@
 }
 
 /* Standalone mobile: lock width, prevent resize, smooth touch.
-   Use env() for safe area so header can extend into notch/Dynamic Island region. */
+   Use env() for safe area so header can extend into notch/Dynamic Island region.
+   Post-detail modal extends to top edge (images flush to screen) via --post-detail-chrome-offset. */
 .standalone-prototype .phone-screen {
   --safe-area-top: env(safe-area-inset-top, 44px);
+  --chrome-offset: 0px;
+  --post-detail-chrome-offset: env(safe-area-inset-top, 44px);
   touch-action: manipulation;
   min-height: 100dvh;
   min-height: -webkit-fill-available;

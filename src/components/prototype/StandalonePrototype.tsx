@@ -52,7 +52,6 @@ export function StandalonePrototype() {
           bottom: "auto",
           paddingTop: 0,
           borderRadius: 0,
-          "--chrome-offset": "0px",
         } as React.CSSProperties}
         onPointerEnter={handlePointerEnter}
         onPointerLeave={handlePointerLeave}

@@ -430,11 +430,11 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
           {isModal && screen === "post-detail" && (
             <motion.div
               key="modal-post-detail"
-              className="absolute left-0 right-0 bottom-0 z-50 flex flex-col bg-cl-surface overflow-hidden"
+              className="post-detail-modal absolute left-0 right-0 bottom-0 z-50 flex flex-col bg-cl-surface overflow-hidden"
               style={
                 {
-                  top: "calc(var(--chrome-offset) * -1)",
-                  "--modal-extends-up": "var(--chrome-offset)",
+                  top: "calc(var(--post-detail-chrome-offset) * -1)",
+                  "--modal-extends-up": "var(--post-detail-chrome-offset)",
                 } as React.CSSProperties
               }
               initial={{ y: "100%" }}

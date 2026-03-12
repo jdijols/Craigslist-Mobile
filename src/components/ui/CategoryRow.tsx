@@ -118,11 +118,11 @@ export function CategoryRow({
 
   return (
     <div
-      className={`overflow-hidden transition-[max-height] duration-300 ease-in-out shrink-0 ${
-        collapsed ? "max-h-0" : "max-h-[44px]"
+      className={`category-row grid shrink-0 transition-[grid-template-rows] duration-300 ease-out ${
+        collapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
       }`}
     >
-      <div className="flex items-center">
+      <div className="flex min-h-0 items-center overflow-hidden">
         <div
           ref={rowRef}
           className="flex flex-1 min-w-0 overflow-x-auto overscroll-x-contain pl-1.5 pr-2 scrollbar-none"

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useLayoutEffect, useCallback } from "react";
+import { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   Star, MapPin, Clock, X, Phone, Mail, ExternalLink,
@@ -35,10 +35,17 @@ const CTA_H = 138;
 const HEADER_H = 112;
 const HANDLE_H = 24;
 const NAV_CLEARANCE = 60;
-const SWIPE_THRESHOLD = 30;
 /** Space reserved at top for overlay buttons (status bar + gap + button height). Sheet must top below this. */
 const OVERLAY_RESERVED_TOP = 96; /* 44 (safe-area) + 12 (gap) + 40 (button h-10) */
 const OVERLAY_GAP = 12; /* gap between overlay bottom and sheet top when expanded */
+/** Velocity (px/s) above which a downward flick snaps toward collapsed */
+const VELOCITY_DOWN_THRESHOLD = 350;
+/** Velocity (px/s) above which an upward flick snaps toward expanded */
+const VELOCITY_UP_THRESHOLD = 350;
+/** Max movement (px) to treat as a click rather than drag */
+const CLICK_THRESHOLD = 8;
+/** Min swipe distance (px) for magnet: scroll past last image → expand */
+const MAGNET_SWIPE_THRESHOLD = 30;
 
 interface PostDetailProps {
   onNavigate?: (screen: ScreenId) => void;
@@ -155,54 +162,145 @@ export function PostDetail({
     setReady(true);
   }, [sheetY, images.length]);
 
+  const prefersReducedMotion = useMemo(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    [],
+  );
+
   const snapTo = useCallback(
     (idx: number) => {
       const clamped = Math.max(0, Math.min(snapPoints.length - 1, idx));
       setSnapIdx(clamped);
-      animate(sheetY, snapPoints[clamped], {
-        type: "spring",
-        damping: 30,
-        stiffness: 300,
-      });
+      animate(sheetY, snapPoints[clamped], prefersReducedMotion
+        ? { duration: 0.2, ease: "easeOut" }
+        : { type: "spring", damping: 25, stiffness: 250 },
+      );
     },
-    [snapPoints, sheetY, snapIdx],
+    [snapPoints, sheetY, prefersReducedMotion],
   );
 
-  /* ── Swipe detection on header ── */
-  const touchRef = useRef({ y: 0, time: 0 });
+  /* ── Drag-following with velocity-based snap ── */
+  const dragRef = useRef<{
+    startClientY: number;
+    startSheetY: number;
+    startTime: number;
+    prevY: number;
+    prevTime: number;
+    didMove: boolean;
+  } | null>(null);
+  const lastDragDidMove = useRef(false);
 
-  const onSwipeStart = useCallback((clientY: number) => {
-    touchRef.current = { y: clientY, time: Date.now() };
+  const getVelocity = useCallback(() => {
+    const d = dragRef.current;
+    if (!d) return 0;
+    const dt = (d.prevTime - d.startTime) / 1000;
+    if (dt < 0.01) return 0;
+    return (d.prevY - d.startClientY) / dt;
   }, []);
 
-  const onSwipeEnd = useCallback(
-    (clientY: number) => {
-      const dy = clientY - touchRef.current.y;
-      if (dy < -SWIPE_THRESHOLD) {
-        snapTo(snapIdx - 1);
-      } else if (dy > SWIPE_THRESHOLD) {
-        snapTo(snapIdx + 1);
+  const findNearestSnapIndex = useCallback(
+    (y: number, velocityY: number) => {
+      const pts = snapPoints;
+      if (velocityY > VELOCITY_DOWN_THRESHOLD) {
+        const idx = pts.findIndex((p) => p >= y);
+        return idx >= 0 ? idx : pts.length - 1;
       }
+      if (velocityY < -VELOCITY_UP_THRESHOLD) {
+        for (let i = pts.length - 1; i >= 0; i--) {
+          if (pts[i] <= y) return i;
+        }
+        return 0;
+      }
+      let nearest = 0;
+      let minDist = Math.abs(y - pts[0]);
+      for (let i = 1; i < pts.length; i++) {
+        const d = Math.abs(y - pts[i]);
+        if (d < minDist) {
+          minDist = d;
+          nearest = i;
+        }
+      }
+      return nearest;
     },
-    [snapIdx, snapTo],
+    [snapPoints],
   );
 
-  const handleHeaderTouchStart = useCallback(
-    (e: React.TouchEvent) => onSwipeStart(e.touches[0].clientY),
-    [onSwipeStart],
+  const handleHeaderPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      const clientY = e.clientY;
+      const now = Date.now();
+      dragRef.current = {
+        startClientY: clientY,
+        startSheetY: sheetY.get(),
+        startTime: now,
+        prevY: clientY,
+        prevTime: now,
+        didMove: false,
+      };
+    },
+    [sheetY],
   );
-  const handleHeaderTouchEnd = useCallback(
-    (e: React.TouchEvent) => onSwipeEnd(e.changedTouches[0].clientY),
-    [onSwipeEnd],
-  );
-  const handleHeaderMouseDown = useCallback(
-    (e: React.MouseEvent) => onSwipeStart(e.clientY),
-    [onSwipeStart],
-  );
-  const handleHeaderMouseUp = useCallback(
-    (e: React.MouseEvent) => onSwipeEnd(e.clientY),
-    [onSwipeEnd],
-  );
+
+  useEffect(() => {
+    if (!ready || snapPoints.length === 0) return;
+
+    const onPointerMove = (e: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d) return;
+      const clientY = e.clientY;
+      const deltaY = clientY - d.startClientY;
+      const newY = Math.max(
+        snapPoints[0],
+        Math.min(snapPoints[snapPoints.length - 1], d.startSheetY + deltaY),
+      );
+      sheetY.set(newY);
+      if (Math.abs(deltaY) > CLICK_THRESHOLD) d.didMove = true;
+      d.prevY = clientY;
+      d.prevTime = Date.now();
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d) return;
+      lastDragDidMove.current = d.didMove;
+      (e.target as HTMLElement)?.releasePointerCapture?.(e.pointerId);
+      const velocityY = getVelocity();
+      const currentY = sheetY.get();
+      const targetIdx = findNearestSnapIndex(currentY, velocityY);
+      setSnapIdx(targetIdx);
+      animate(sheetY, snapPoints[targetIdx], prefersReducedMotion
+        ? { duration: 0.2, ease: "easeOut" }
+        : { type: "spring", damping: 25, stiffness: 250 },
+      );
+      dragRef.current = null;
+    };
+
+    const onPointerCancel = (e: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d) return;
+      lastDragDidMove.current = d.didMove;
+      (e.target as HTMLElement)?.releasePointerCapture?.(e.pointerId);
+      const currentY = sheetY.get();
+      const targetIdx = findNearestSnapIndex(currentY, 0);
+      setSnapIdx(targetIdx);
+      animate(sheetY, snapPoints[targetIdx], prefersReducedMotion
+        ? { duration: 0.2, ease: "easeOut" }
+        : { type: "spring", damping: 25, stiffness: 250 },
+      );
+      dragRef.current = null;
+    };
+
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("pointerup", onPointerUp);
+    document.addEventListener("pointercancel", onPointerCancel);
+    return () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("pointerup", onPointerUp);
+      document.removeEventListener("pointercancel", onPointerCancel);
+    };
+  }, [ready, snapPoints, sheetY, getVelocity, findNearestSnapIndex, prefersReducedMotion]);
 
   /* ── Scroll-wheel on header: scroll up → expand, scroll down → collapse ── */
   const handleHeaderWheel = useCallback(
@@ -238,8 +336,9 @@ export function PostDetail({
     [3, 0],
   );
 
-  /* ── Click on handle bar toggles between expanded / default ── */
+  /* ── Click on handle bar toggles between expanded / default (not when it was a drag) ── */
   const handleHandleClick = useCallback(() => {
+    if (lastDragDidMove.current) return;
     snapTo(isExpanded ? 1 : 0);
   }, [isExpanded, snapTo]);
 
@@ -273,7 +372,7 @@ export function PostDetail({
       if (isExpanded) return;
       const dy = imgTouchStartY.current - e.changedTouches[0].clientY;
       const atBottom = isImagesAtBottom();
-      if (dy > SWIPE_THRESHOLD && atBottom) {
+      if (dy > MAGNET_SWIPE_THRESHOLD && atBottom) {
         snapTo(0);
       }
     },
@@ -378,14 +477,11 @@ export function PostDetail({
         className="absolute inset-x-0 top-0 z-20 flex flex-col bg-cl-surface shadow-[var(--shadow-sheet)]"
         style={{ y: sheetY, bottom: CTA_H, visibility: ready ? "visible" : "hidden" }}
       >
-        {/* Header — swipe / scroll / click target (handle + title + price) */}
+        {/* Header — drag / scroll / click target (handle + title + price) */}
         <div
           className="shrink-0 select-none"
           style={{ cursor: "grab", touchAction: "none" }}
-          onTouchStart={handleHeaderTouchStart}
-          onTouchEnd={handleHeaderTouchEnd}
-          onMouseDown={handleHeaderMouseDown}
-          onMouseUp={handleHeaderMouseUp}
+          onPointerDown={handleHeaderPointerDown}
           onWheel={handleHeaderWheel}
         >
           <button

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStatusBarColorFromElement } from "@/contexts/StatusBarColorContext";
 
@@ -14,11 +14,25 @@ export function StandaloneCover() {
   const [visible, setVisible] = useState(true);
   const statusBarRef = useStatusBarColorFromElement();
 
+  useEffect(() => {
+    if (visible) {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [visible]);
+
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto"
+          className="fixed inset-0 z-[200] flex h-screen min-h-screen w-full items-center justify-center overflow-hidden overscroll-none"
           variants={exitVariants}
           initial="visible"
           animate="visible"
@@ -26,7 +40,7 @@ export function StandaloneCover() {
         >
           <div
             ref={visible ? statusBarRef : undefined}
-            className="absolute inset-0 backdrop-blur-2xl"
+            className="absolute inset-0"
             style={{ backgroundColor: "var(--standalone-cover-bg)" }}
           />
 
