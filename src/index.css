@@ -80,6 +80,11 @@
   --standalone-cover-bg: rgba(249, 250, 251, 0.88);
 }
 
+/* Light mode: white body for status bar (black-translucent) and theme-color */
+body {
+  background-color: #ffffff;
+}
+
 @media (prefers-color-scheme: dark) {
   /* Outer chrome (body, presentation area) */
   body {
