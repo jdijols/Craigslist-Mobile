@@ -79,30 +79,7 @@ export function SearchScreen({
   const contentScrollRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const collapsedRef = useRef(false);
-  const scrollCooldown = useRef(0);
-  const prevHeaderCollapsed = useRef<boolean | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
-
-  const CATEGORY_ROW_HEIGHT = 44;
-
-  useLayoutEffect(() => {
-    if (prevHeaderCollapsed.current === null) {
-      prevHeaderCollapsed.current = headerCollapsed;
-      return;
-    }
-    const el = contentScrollRef.current;
-    if (!el) return;
-    const wasCollapsed = prevHeaderCollapsed.current;
-    prevHeaderCollapsed.current = headerCollapsed;
-    scrollCooldown.current = Date.now() + 350;
-    if (wasCollapsed && !headerCollapsed) {
-      el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, el.scrollTop + CATEGORY_ROW_HEIGHT);
-      lastScrollTop.current = el.scrollTop;
-    } else if (!wasCollapsed && headerCollapsed) {
-      el.scrollTop = Math.max(0, el.scrollTop - CATEGORY_ROW_HEIGHT);
-      lastScrollTop.current = el.scrollTop;
-    }
-  }, [headerCollapsed]);
 
   const isTyping = draft.trim().length > 0;
 
@@ -117,37 +94,30 @@ export function SearchScreen({
       prevActiveTabRef.current = activeTab;
     }
   }, [isTyping, activeTab]);
-  const headerPaddingTop = isTyping ? 44 : (headerCollapsed ? 44 : 88);
+
+  /** Option C: when typing, 48px (4px gap + search bar). When !typing, fixed 92px (4px gap + search bar + 44px buffer). Recent/saved row overlays buffer. */
+  const headerPaddingTop = isTyping ? 48 : 92;
 
   const handleContentScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
-    const now = Date.now();
+    if (isTyping) return;
     const scrollTop = e.currentTarget.scrollTop;
-
-    if (now < scrollCooldown.current) {
-      lastScrollTop.current = scrollTop;
-      return;
-    }
-
     const delta = scrollTop - lastScrollTop.current;
 
     if (scrollTop <= 0) {
       if (collapsedRef.current) {
         collapsedRef.current = false;
         setHeaderCollapsed(false);
-        scrollCooldown.current = now + 400;
       }
     } else if (delta > 6 && !collapsedRef.current) {
       collapsedRef.current = true;
       setHeaderCollapsed(true);
-      scrollCooldown.current = now + 400;
     } else if (delta < -6 && collapsedRef.current) {
       collapsedRef.current = false;
       setHeaderCollapsed(false);
-      scrollCooldown.current = now + 400;
     }
 
     lastScrollTop.current = scrollTop;
-  }, []);
+  }, [isTyping]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -278,74 +248,86 @@ export function SearchScreen({
 
   return (
     <div className="relative h-full bg-cl-bg">
-      {/* Header — safe-area filler covers status bar region, no negative offset so no clipping */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
-        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
-        <div className="flex h-header-bar items-center gap-2 px-4">
-          <div
-            className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input cursor-text focus-within:border-cl-accent transition-colors"
-            onClick={() => inputRef.current?.focus()}
-          >
-            <SearchIcon className="h-4 w-4 shrink-0 text-cl-text-muted pointer-events-none" />
-            <input
-              ref={inputRef}
-              type="text"
-              autoFocus
-              enterKeyHint="search"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={searchPlaceholder}
-              className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
-            />
-            {draft.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  setDraft("");
-                  inputRef.current?.focus();
-                }}
-                className="flex shrink-0 items-center justify-center rounded-full bg-cl-text-muted/80 p-[2px] outline-none active:opacity-70"
-                aria-label="Clear text"
-              >
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white">
-                  <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </button>
-            )}
+      {/* Header — Layer 1: safe-area + search bar (fixed). Layer 2: recent/saved row overlay when !typing. */}
+      <div className="absolute top-0 left-0 right-0 z-10">
+        {/* Layer 1: safe-area + 4px gap + search bar — always in layout flow */}
+        <div
+          className={`bg-cl-surface ${isTyping || headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
+        >
+          <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+          <div style={{ height: 4 }} aria-hidden />
+          <div className="flex h-header-bar items-center gap-2 px-4">
+            <div
+              className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input cursor-text focus-within:border-cl-accent transition-colors"
+              onClick={() => inputRef.current?.focus()}
+            >
+              <SearchIcon className="h-4 w-4 shrink-0 text-cl-text-muted pointer-events-none" />
+              <input
+                ref={inputRef}
+                type="text"
+                autoFocus
+                enterKeyHint="search"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={searchPlaceholder}
+                className="w-0 flex-1 bg-transparent text-base text-cl-text placeholder:text-cl-text-muted outline-none text-ellipsis"
+              />
+              {draft.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft("");
+                    inputRef.current?.focus();
+                  }}
+                  className="flex shrink-0 items-center justify-center rounded-full bg-cl-text-muted/80 p-[2px] outline-none active:opacity-70"
+                  aria-label="Clear text"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white">
+                    <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            <CloseButton onClick={handleCancel} aria-label="Cancel search" />
           </div>
-          <CloseButton onClick={handleCancel} aria-label="Cancel search" />
         </div>
 
+        {/* Layer 2: recent/saved row overlay — overlays the 44px buffer when !typing (4px overlap eliminates gap) */}
         {!isTyping && (
-          <CategoryRow
-            labels={SEARCH_TABS}
-            activeLabel={activeTab}
-            onLabelChange={(label) => setActiveTab(label as typeof activeTab)}
-            collapsed={headerCollapsed}
-            preventFocusSteal
-            rightSlot={
-              (activeTab === "recent" && recents.length > 0) ? (
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setConfirmAction({ kind: "clear-recent" })}
-                  className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
-                >
-                  reset recent
-                </button>
-              ) : (activeTab === "saved" && saved.length > 0) ? (
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => setConfirmAction({ kind: "clear-saved" })}
-                  className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
-                >
-                  reset saved
-                </button>
-              ) : undefined
-            }
-          />
+          <div
+            className={`absolute left-0 right-0 z-10 overflow-hidden bg-cl-surface ${!headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
+            style={{ top: "calc(var(--safe-area-top) + 4px + 40px)" }}
+          >
+            <CategoryRow
+              labels={SEARCH_TABS}
+              activeLabel={activeTab}
+              onLabelChange={(label) => setActiveTab(label as typeof activeTab)}
+              collapsed={headerCollapsed}
+              preventFocusSteal
+              rightSlot={
+                (activeTab === "recent" && recents.length > 0) ? (
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setConfirmAction({ kind: "clear-recent" })}
+                    className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
+                  >
+                    reset recent
+                  </button>
+                ) : (activeTab === "saved" && saved.length > 0) ? (
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setConfirmAction({ kind: "clear-saved" })}
+                    className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
+                  >
+                    reset saved
+                  </button>
+                ) : undefined
+              }
+            />
+          </div>
         )}
       </div>
 

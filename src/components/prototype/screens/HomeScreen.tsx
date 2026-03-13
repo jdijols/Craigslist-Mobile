@@ -151,30 +151,7 @@ export function HomeScreen({
 
   const lastScrollTop = useRef(0);
   const collapsedRef = useRef(false);
-  const scrollCooldown = useRef(0);
-  const prevHeaderCollapsed = useRef<boolean | null>(null);
   const [headerCollapsed, setHeaderCollapsed] = useState(false);
-
-  const CATEGORY_ROW_HEIGHT = 44;
-
-  useLayoutEffect(() => {
-    if (prevHeaderCollapsed.current === null) {
-      prevHeaderCollapsed.current = headerCollapsed;
-      return;
-    }
-    const el = contentScrollRef.current;
-    if (!el) return;
-    const wasCollapsed = prevHeaderCollapsed.current;
-    prevHeaderCollapsed.current = headerCollapsed;
-    scrollCooldown.current = Date.now() + 350;
-    if (wasCollapsed && !headerCollapsed) {
-      el.scrollTop = Math.min(el.scrollHeight - el.clientHeight, el.scrollTop + CATEGORY_ROW_HEIGHT);
-      lastScrollTop.current = el.scrollTop;
-    } else if (!wasCollapsed && headerCollapsed) {
-      el.scrollTop = Math.max(0, el.scrollTop - CATEGORY_ROW_HEIGHT);
-      lastScrollTop.current = el.scrollTop;
-    }
-  }, [headerCollapsed]);
 
   const scrollPositionsRef = useRef<Record<string, number>>({});
   const prevViewKeyRef = useRef<string | null>(null);
@@ -190,9 +167,7 @@ export function HomeScreen({
     const restore = scrollPositionsRef.current[viewKey] ?? 0;
     collapsedRef.current = false;
     setHeaderCollapsed(false);
-    prevHeaderCollapsed.current = false;
     lastScrollTop.current = restore;
-    scrollCooldown.current = Date.now() + 150;
     if (el) el.scrollTop = restore;
     prevViewKeyRef.current = viewKey;
   }, [viewKey]);
@@ -288,30 +263,20 @@ export function HomeScreen({
   }, [restoreSignal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleContentScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
-    const now = Date.now();
     const scrollTop = e.currentTarget.scrollTop;
-
-    if (now < scrollCooldown.current) {
-      lastScrollTop.current = scrollTop;
-      return;
-    }
-
     const delta = scrollTop - lastScrollTop.current;
 
     if (scrollTop <= 0) {
       if (collapsedRef.current) {
         collapsedRef.current = false;
         setHeaderCollapsed(false);
-        scrollCooldown.current = now + 400;
       }
     } else if (delta > 6 && !collapsedRef.current) {
       collapsedRef.current = true;
       setHeaderCollapsed(true);
-      scrollCooldown.current = now + 400;
     } else if (delta < -6 && collapsedRef.current) {
       collapsedRef.current = false;
       setHeaderCollapsed(false);
-      scrollCooldown.current = now + 400;
     }
 
     lastScrollTop.current = scrollTop;
@@ -383,58 +348,69 @@ export function HomeScreen({
     [activeCategory, activeSubcategory],
   );
 
-  const headerPaddingTop = headerCollapsed ? 44 : 88;
+  /** Option C: fixed 92px (4px gap + 44 header bar + 44 buffer). Category row overlays the buffer when expanded. */
+  const headerPaddingTop = 92;
 
   return (
     <div className="relative h-full">
-      {/* Header — safe-area filler covers status bar region, no negative offset so no clipping */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-cl-surface border-b-[0.5px] border-cl-border">
-        <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
-        {/* Locator / search row */}
-        <div className="flex h-header-bar items-center gap-3 pl-1.5 pr-4">
-          <button
-            type="button"
-            onClick={() => setLocationPickerOpen(true)}
-            className="flex shrink-0 min-h-[44px] items-center gap-1.5 outline-none px-2.5"
-            aria-label="Change location"
-          >
-            <MapPin className="h-5 w-5 text-cl-accent" />
-            <span className="text-base font-semibold leading-[25px] text-cl-accent">
-              {locationName}
-            </span>
-          </button>
+      {/* Header — Layer 1: safe-area + header bar (fixed). Layer 2: category row overlay. */}
+      <div className="absolute top-0 left-0 right-0 z-10">
+        {/* Layer 1: safe-area + 4px gap + header bar — always in layout flow */}
+        <div
+          className={`bg-cl-surface ${headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
+        >
+          <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
+          <div style={{ height: 4 }} aria-hidden />
+          <div className="flex h-header-bar items-center gap-3 pl-1.5 pr-4">
+            <button
+              type="button"
+              onClick={() => setLocationPickerOpen(true)}
+              className="flex shrink-0 min-h-[44px] items-center gap-1.5 outline-none px-2.5"
+              aria-label="Change location"
+            >
+              <MapPin className="h-5 w-5 text-cl-accent" />
+              <span className="text-base font-semibold leading-[25px] text-cl-accent">
+                {locationName}
+              </span>
+            </button>
 
-          {searchTerm ? (
-            <div className="flex min-w-0 flex-1 justify-end">
-              <SearchChip
-                term={searchTerm}
-                onClear={() => onClearSearch?.()}
-                onEdit={() => onNavigate?.("search")}
-              />
-            </div>
-          ) : (
-            <div className="flex flex-1 justify-end">
-              <button
-                type="button"
-                onClick={() => onNavigate?.("search")}
-                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-[--radius-button] outline-none active:opacity-70"
-                aria-label="Search"
-              >
-                <Search className="h-6 w-6 text-cl-text" strokeWidth={1.8} />
-              </button>
-            </div>
-          )}
+            {searchTerm ? (
+              <div className="flex min-w-0 flex-1 justify-end">
+                <SearchChip
+                  term={searchTerm}
+                  onClear={() => onClearSearch?.()}
+                  onEdit={() => onNavigate?.("search")}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-1 justify-end">
+                <button
+                  type="button"
+                  onClick={() => onNavigate?.("search")}
+                  className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 cursor-pointer items-center justify-center rounded-[--radius-button] outline-none active:opacity-70"
+                  aria-label="Search"
+                >
+                  <Search className="h-6 w-6 text-cl-text" strokeWidth={1.8} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Category chip row */}
-        <CategoryRow
-          labels={chipLabels}
-          activeLabel={activeChipLabel}
-          onLabelChange={handleCategoryChange}
-          collapsed={headerCollapsed}
-          onLongPress={handleCategoryLongPress}
-          renderTrailing={renderChevron}
-        />
+        {/* Layer 2: category row overlay — overlays the 44px buffer in scroll content (4px overlap eliminates gap) */}
+        <div
+          className={`absolute left-0 right-0 z-10 overflow-hidden bg-cl-surface ${!headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
+          style={{ top: "calc(var(--safe-area-top) + 4px + 40px)" }}
+        >
+          <CategoryRow
+            labels={chipLabels}
+            activeLabel={activeChipLabel}
+            onLabelChange={handleCategoryChange}
+            collapsed={headerCollapsed}
+            onLongPress={handleCategoryLongPress}
+            renderTrailing={renderChevron}
+          />
+        </div>
       </div>
 
       {/* Content area — full height from top, padding-top reserves space for header */}

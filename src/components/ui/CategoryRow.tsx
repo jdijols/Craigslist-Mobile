@@ -118,7 +118,7 @@ export function CategoryRow({
 
   return (
     <div
-      className={`category-row grid shrink-0 transition-[grid-template-rows] duration-300 ease-out ${
+      className={`category-row grid shrink-0 bg-cl-surface transition-[grid-template-rows] duration-300 ease-out ${
         collapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
       }`}
     >
