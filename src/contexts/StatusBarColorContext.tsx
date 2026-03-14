@@ -25,23 +25,24 @@ function getDefaultColor(): string {
     : DEFAULT_LIGHT;
 }
 
-function applyStatusBarColor(color: string) {
-  document.documentElement.style.setProperty("--status-bar-bg", color);
+function applyStatusBarColor(top: string, bottom?: string) {
+  document.documentElement.style.setProperty("--status-bar-bg", top);
 
   const meta = document.querySelector<HTMLMetaElement>(
     'meta[name="theme-color"]',
   );
-  if (meta) meta.content = color;
+  if (meta) meta.content = top;
 
   const topEl = document.getElementById("safari-status-bar-tint");
   const bottomEl = document.getElementById("safari-home-indicator-tint");
-  if (topEl) topEl.style.backgroundColor = color;
-  if (bottomEl) bottomEl.style.backgroundColor = color;
+  if (topEl) topEl.style.backgroundColor = top;
+  if (bottomEl) bottomEl.style.backgroundColor = bottom ?? top;
 }
 
 interface StatusBarColorContextValue {
-  /** Set status bar color. Pass null to revert to default (header color by theme). */
-  setStatusBarColor: (color: string | null) => void;
+  /** Set status bar color. Pass null to revert to default (header color by theme).
+   *  Optional second arg sets a different bottom (home indicator) color. */
+  setStatusBarColor: (color: string | null, bottomColor?: string | null) => void;
 }
 
 const StatusBarColorContext = createContext<StatusBarColorContextValue | null>(
@@ -50,6 +51,7 @@ const StatusBarColorContext = createContext<StatusBarColorContextValue | null>(
 
 export function StatusBarColorProvider({ children }: { children: ReactNode }) {
   const [override, setOverride] = useState<string | null>(null);
+  const [bottomOverride, setBottomOverride] = useState<string | null>(null);
   const [defaultColor, setDefaultColor] = useState(getDefaultColor);
 
   useEffect(() => {
@@ -64,11 +66,12 @@ export function StatusBarColorProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const color = override ?? defaultColor;
-    applyStatusBarColor(color);
-  }, [override, defaultColor]);
+    applyStatusBarColor(color, bottomOverride ?? undefined);
+  }, [override, bottomOverride, defaultColor]);
 
-  const setStatusBarColor = useCallback((color: string | null) => {
+  const setStatusBarColor = useCallback((color: string | null, bottomColor?: string | null) => {
     setOverride(color);
+    setBottomOverride(bottomColor ?? null);
   }, []);
 
   return (

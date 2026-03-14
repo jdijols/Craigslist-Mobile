@@ -20,6 +20,7 @@ import { ListingAttributes } from "../components/ListingAttributes";
 import { HOOD_COORDS } from "../components/MapView";
 import { StaticMapLayer } from "../components/StaticMapLayer";
 import type { PostCategory } from "../../ui/cards/types";
+import { useStatusBarColor } from "../../../contexts/StatusBarColorContext";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "for sale": ShoppingBag,
@@ -73,6 +74,15 @@ export function PostDetail({
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const contactInfo = { phone: "7325478709", email: "jasondijols@gmail.com" };
+
+  /* Set Safari safe-area tints: black top (images), surface bottom (CTA) */
+  const { setStatusBarColor } = useStatusBarColor();
+  useEffect(() => {
+    const surface = getComputedStyle(document.documentElement)
+      .getPropertyValue("--color-cl-surface").trim() || "#ffffff";
+    setStatusBarColor("#000000", surface);
+    return () => setStatusBarColor(null);
+  }, [setStatusBarColor]);
 
   const handleCopy = useCallback((type: "phone" | "email") => {
     const value = type === "phone" ? contactInfo.phone : contactInfo.email;
