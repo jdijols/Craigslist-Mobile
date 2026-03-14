@@ -45,7 +45,7 @@ export function ReplySheet({ open, listingTitle, onSend, onClose }: ReplySheetPr
               </p>
             </div>
 
-            <div className="mx-4 rounded-[--radius-card] border-2 border-cl-border bg-cl-bg-secondary p-3 focus-within:border-cl-accent transition-colors">
+            <div className="mx-4 rounded-[--radius-card] bg-cl-bg-secondary p-3 transition-colors">
               <textarea
                 className="w-full resize-none bg-transparent text-base text-cl-text outline-none placeholder:text-cl-text-muted"
                 rows={3}

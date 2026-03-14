@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useLayoutEffect, useCallback, useEffect } from "react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
-  Star, MapPin, Clock, X, Phone, Mail, ExternalLink,
+  Star, MapPin, Clock, X, Phone, Mail, ExternalLink, Copy,
   ShoppingBag, Home, Briefcase, Wrench, Users, Zap, FileText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -33,11 +33,9 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 
 const CTA_H = 138;
 const HEADER_H = 112;
-const HANDLE_H = 24;
-const NAV_CLEARANCE = 60;
-/** Space reserved at top for overlay buttons (status bar + gap + button height). Sheet must top below this. */
-const OVERLAY_RESERVED_TOP = 96; /* 44 (safe-area) + 12 (gap) + 40 (button h-10) */
-const OVERLAY_GAP = 12; /* gap between overlay bottom and sheet top when expanded */
+const OVERLAY_BTN_GAP = 12; /* gap between safe-area-top and overlay buttons */
+const OVERLAY_BTN_H = 40; /* button h-10 */
+const OVERLAY_GAP = 16; /* gap between overlay bottom and sheet top when expanded */
 /** Velocity (px/s) above which a downward flick snaps toward collapsed */
 const VELOCITY_DOWN_THRESHOLD = 350;
 /** Velocity (px/s) above which an upward flick snaps toward expanded */
@@ -54,6 +52,7 @@ interface PostDetailProps {
   variantId?: PostDetailVariantId;
   variant?: PostDetailVariant;
   listing?: ListingData | null;
+  hasExistingChat?: boolean;
 }
 
 export function PostDetail({
@@ -63,12 +62,25 @@ export function PostDetail({
   variantId = "dresser",
   variant: variantProp,
   listing,
+  hasExistingChat,
 }: PostDetailProps) {
-  const defaultMessage = "hi, i'm interested in your post!";
+  const defaultMessage = hasExistingChat ? "" : "hi, i'm interested in your post!";
   const [shareOpen, setShareOpen] = useState(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
   const [message, setMessage] = useState(defaultMessage);
+  const [copyToast, setCopyToast] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const contactInfo = { phone: "7325478709", email: "jasondijols@gmail.com" };
+
+  const handleCopy = useCallback((type: "phone" | "email") => {
+    const value = type === "phone" ? contactInfo.phone : contactInfo.email;
+    navigator.clipboard.writeText(value).catch(() => {});
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    setCopyToast(`${type === "phone" ? "phone number" : "email"} copied`);
+    copyTimeoutRef.current = setTimeout(() => setCopyToast(null), 1800);
+  }, []);
   const variant = variantProp ?? postDetailVariants[variantId];
 
   const effectiveListing: ListingData = listing ?? {
@@ -126,16 +138,16 @@ export function PostDetail({
   const [containerW, setContainerW] = useState(390);
   const [chromeOff, setChromeOff] = useState(47);
   const [modalExtendsUp, setModalExtendsUp] = useState(0);
+  const [safeAreaTop, setSafeAreaTop] = useState(44);
 
   const snapPoints = useMemo(() => {
-    const overlayBottom = OVERLAY_RESERVED_TOP + modalExtendsUp;
-    const fullSnap = Math.max(chromeOff + NAV_CLEARANCE, overlayBottom + OVERLAY_GAP);
+    const overlayBottom = safeAreaTop + OVERLAY_BTN_GAP + modalExtendsUp + OVERLAY_BTN_H;
+    const fullSnap = overlayBottom + OVERLAY_GAP;
     const allImagesBottom = chromeOff + Math.round(containerW * 0.75) * images.length;
     const maxDefault = containerH - CTA_H - HEADER_H;
     const defaultSnap = Math.min(allImagesBottom, maxDefault);
-    const collapsedSnap = containerH - CTA_H - HANDLE_H;
-    return [fullSnap, defaultSnap, collapsedSnap];
-  }, [containerH, containerW, chromeOff, modalExtendsUp, images.length]);
+    return [fullSnap, defaultSnap];
+  }, [containerH, containerW, chromeOff, modalExtendsUp, safeAreaTop, images.length]);
 
   const imagesPadding = containerH - snapPoints[1];
 
@@ -150,10 +162,15 @@ export function PostDetail({
       getComputedStyle(el).getPropertyValue("--modal-extends-up").trim() || "0",
       10
     );
+    const sa = parseInt(
+      getComputedStyle(el).getPropertyValue("--safe-area-top").trim() || "0",
+      10
+    );
     setContainerH(h);
     setContainerW(w);
     setChromeOff(co);
     setModalExtendsUp(Number.isNaN(me) ? 0 : me);
+    setSafeAreaTop(Number.isNaN(sa) ? 0 : sa);
 
     const allImagesBottom = co + Math.round(w * 0.75) * images.length;
     const maxDefault = h - CTA_H - HEADER_H;
@@ -409,15 +426,18 @@ export function PostDetail({
           <button
             type="button"
             onClick={() => toggleFavorite(effectiveListing)}
-            className="flex h-10 w-10 items-center justify-center outline-none active:opacity-90"
+            className="relative flex h-10 w-10 items-center justify-center outline-none active:opacity-90"
             aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
           >
             <Star
               className="h-5 w-5"
               strokeWidth={1.8}
-              stroke="var(--color-cl-text)"
-              fill={isFav ? "var(--color-cl-favorite)" : "transparent"}
+              stroke={isFav ? "var(--color-cl-favorite)" : "var(--color-cl-text)"}
+              fill="transparent"
             />
+            {isFav && (
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-cl-favorite" />
+            )}
           </button>
           <button
             type="button"
@@ -457,11 +477,7 @@ export function PostDetail({
               loading={i === 0 ? "eager" : "lazy"}
               draggable={false}
             />
-            {i === 0 && images.length > 1 && (
-              <span className="absolute bottom-3 right-3 rounded-[0] bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white">
-                1 / {images.length}
-              </span>
-            )}
+
           </button>
         ))}
       </div>
@@ -502,11 +518,11 @@ export function PostDetail({
             </motion.div>
           </button>
           <div className="px-4 pt-1">
-            <p className="text-[19px] font-bold leading-snug text-cl-text">
-              {variant.title}
-            </p>
-            <p className="mt-0.5 text-[16px] font-bold text-cl-price">
+            <p className="text-[16px] font-bold text-cl-price">
               {variant.price}
+            </p>
+            <p className="mt-0.5 text-[19px] leading-snug text-cl-text">
+              {variant.title}
             </p>
           </div>
         </div>
@@ -611,34 +627,68 @@ export function PostDetail({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
-            placeholder={defaultMessage}
-            className="h-11 min-w-0 flex-1 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 text-base text-cl-text outline-none placeholder:text-cl-text-muted focus:border-cl-accent transition-colors"
+            placeholder={hasExistingChat ? "write something..." : defaultMessage}
+            className="h-11 min-w-0 flex-1 rounded-[--radius-button] bg-cl-bg-secondary px-3 text-base text-cl-text outline-none placeholder:text-cl-text-muted transition-colors"
           />
-          <button
-            type="button"
-            onClick={handleSend}
-            className="flex h-11 shrink-0 items-center justify-center rounded-[--radius-button] bg-cl-accent px-4 outline-none active:opacity-90"
-            aria-label="Send message"
-          >
-            <span className="text-[14px] font-semibold text-cl-accent-text">send</span>
-          </button>
+          {(!hasExistingChat || message.trim()) && (
+            <button
+              type="button"
+              onClick={handleSend}
+              className="flex h-11 shrink-0 items-center justify-center rounded-[--radius-button] bg-cl-accent px-4 outline-none active:opacity-90"
+              aria-label="Send message"
+            >
+              <span className="text-[14px] font-semibold text-cl-accent-text">send</span>
+            </button>
+          )}
         </div>
         <div className="mt-2 flex gap-2">
-          <button
-            type="button"
-            className="flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-[--radius-button] border border-cl-border bg-cl-surface outline-none active:opacity-90"
-          >
-            <Phone className="h-4 w-4 text-cl-text-muted" strokeWidth={2} />
-            <span className="text-[13px] font-medium text-cl-text">call</span>
-          </button>
-          <button
-            type="button"
-            className="flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-[--radius-button] border border-cl-border bg-cl-surface outline-none active:opacity-90"
-          >
-            <Mail className="h-4 w-4 text-cl-text-muted" strokeWidth={2} />
-            <span className="text-[13px] font-medium text-cl-text">email</span>
-          </button>
+          <div className="flex min-h-[40px] flex-1 items-center rounded-[--radius-button] border border-cl-border bg-cl-surface">
+            <a
+              href={`tel:${contactInfo.phone}`}
+              className="flex flex-1 items-center gap-1.5 py-2 pl-3 outline-none active:opacity-90"
+            >
+              <Phone className="h-4 w-4 text-cl-text-muted" strokeWidth={2} />
+              <span className="text-[13px] font-medium text-cl-text">call</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => handleCopy("phone")}
+              className="flex items-center self-stretch border-l border-cl-border px-2.5 outline-none active:opacity-70"
+              aria-label="Copy phone number"
+            >
+              <Copy className="h-3.5 w-3.5 text-cl-text-muted" strokeWidth={2} />
+            </button>
+          </div>
+          <div className="flex min-h-[40px] flex-1 items-center rounded-[--radius-button] border border-cl-border bg-cl-surface">
+            <a
+              href={`mailto:${contactInfo.email}`}
+              className="flex flex-1 items-center gap-1.5 py-2 pl-3 outline-none active:opacity-90"
+            >
+              <Mail className="h-4 w-4 text-cl-text-muted" strokeWidth={2} />
+              <span className="text-[13px] font-medium text-cl-text">email</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => handleCopy("email")}
+              className="flex items-center self-stretch border-l border-cl-border px-2.5 outline-none active:opacity-70"
+              aria-label="Copy email address"
+            >
+              <Copy className="h-3.5 w-3.5 text-cl-text-muted" strokeWidth={2} />
+            </button>
+          </div>
         </div>
+
+        {/* Copy toast */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: copyToast ? 1 : 0, y: copyToast ? 0 : 6 }}
+          transition={{ duration: 0.18 }}
+          className="pointer-events-none absolute inset-x-0 -top-10 flex justify-center"
+        >
+          <span className="rounded-[--radius-button] bg-cl-text px-3 py-1.5 text-[12px] font-medium text-cl-surface">
+            {copyToast}
+          </span>
+        </motion.div>
       </div>
 
       <ShareSheet

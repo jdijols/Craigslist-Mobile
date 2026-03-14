@@ -26,7 +26,7 @@ export function ScreenshotPlaceholder({ label, image }: ScreenshotPlaceholderPro
     const src = images[index % images.length];
     return (
       <div
-        className="absolute inset-0 overflow-hidden bg-[#FAFAFA]"
+        className="absolute inset-0 overflow-hidden bg-cl-bg"
         onClick={cycle}
         style={images.length > 1 ? { cursor: "pointer" } : undefined}
       >
@@ -35,7 +35,7 @@ export function ScreenshotPlaceholder({ label, image }: ScreenshotPlaceholderPro
           alt={label}
           className="w-full"
         />
-        <div className="absolute top-0 left-0 right-0 h-[44px] bg-[#FAFAFA]" />
+        <div className="absolute top-0 left-0 right-0 h-[44px] bg-cl-bg" />
       </div>
     );
   }

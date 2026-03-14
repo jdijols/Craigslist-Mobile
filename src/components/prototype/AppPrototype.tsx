@@ -8,7 +8,7 @@ import type { ViewMode } from "../ui/cards/types";
 import type { PostDetailVariantId, PostDetailVariant } from "../../data/listings";
 import { listingToDetailVariant } from "../../data/listings";
 import type { ListingData } from "../ui/cards/types";
-import { useChatThreads, addChatThread } from "../../data/chats";
+import { useChatThreads, addChatThread, findThreadByListingId, addMessageToThread } from "../../data/chats";
 import type { ChatThread as ChatThreadData } from "../../data/chats";
 import {
   HomeScreen,
@@ -213,12 +213,22 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
 
   const handleReplySubmit = useCallback(
     (message: string, variant: PostDetailVariant) => {
+      const existing = findThreadByListingId(variant.id);
+      if (existing) {
+        addMessageToThread(existing.id, message);
+        const updated = findThreadByListingId(variant.id);
+        if (updated) setActiveChatThread(updated);
+        onNavigate?.("chat-thread");
+        return;
+      }
       const id = `thread-${Date.now()}`;
       const newThread: ChatThreadData = {
         id,
+        listingId: variant.id,
         posterName: variant.title,
         posterInitial: (variant.title[0] ?? "?").toUpperCase(),
         listingTitle: variant.title,
+        listingImage: variant.image,
         listingCategory: variant.categoryLabel ?? "for sale",
         listingSubcategory: "",
         lastMessage: message,
@@ -242,6 +252,16 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
     },
     [onNavigate],
   );
+
+  const handleOpenListingFromChat = useCallback(() => {
+    if (!activeChatThread) return;
+    setActiveListing({
+      id: activeChatThread.listingId,
+      title: activeChatThread.listingTitle,
+      image: activeChatThread.listingImage ?? "",
+    });
+    onNavigate?.("post-detail");
+  }, [activeChatThread, onNavigate]);
 
   const shellScreen = isModal ? settled : screen;
   const hideTabBar = HIDE_TAB_BAR.has(shellScreen);
@@ -300,13 +320,16 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
         );
       }
       if (Component === (PostDetail as React.ComponentType)) {
+        const listingVariant = activeListing ? listingToDetailVariant(activeListing) : undefined;
+        const hasChat = !!(listingVariant && findThreadByListingId(listingVariant.id));
         return (
           <PostDetail
             onNavigate={handleNavigate}
             onReplySubmit={handleReplySubmit}
             variantId={activeVariant}
-            variant={activeListing ? listingToDetailVariant(activeListing) : undefined}
+            variant={listingVariant}
             listing={activeListing}
+            hasExistingChat={hasChat}
           />
         );
       }
@@ -316,6 +339,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
           <ChatThread
             thread={activeChatThread}
             onNavigate={handleNavigate}
+            onOpenListing={handleOpenListingFromChat}
           />
         );
       }
@@ -334,6 +358,8 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
       handleOpenListing,
       handleReplySubmit,
       handleOpenThread,
+      handleOpenListingFromChat,
+      allChatThreads,
       homeActiveCategory,
       homeActiveSubcategory,
       searchTerm,
@@ -449,6 +475,7 @@ export function AppPrototype({ screen, onNavigate, postDetailVariant, homeCatego
                 variantId={activeVariant}
                 variant={activeListing ? listingToDetailVariant(activeListing) : undefined}
                 listing={activeListing}
+                hasExistingChat={!!(activeListing && findThreadByListingId(activeListing.id))}
               />
             </motion.div>
           )}

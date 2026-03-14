@@ -8,7 +8,7 @@ interface SearchChipProps {
 
 export function SearchChip({ term, onClear, onEdit }: SearchChipProps) {
   return (
-    <div className="flex flex-1 min-w-0 min-w-[80px] min-h-[44px] h-search-input max-w-full items-center rounded-[--radius-button] bg-cl-surface border border-cl-border overflow-hidden">
+    <div className="flex flex-1 min-w-0 min-w-[80px] h-search-input max-w-full items-center rounded-[--radius-button] bg-cl-bg-secondary overflow-hidden">
       <button
         type="button"
         onClick={onEdit}
@@ -25,7 +25,7 @@ export function SearchChip({ term, onClear, onEdit }: SearchChipProps) {
           e.stopPropagation();
           onClear();
         }}
-        className="flex shrink-0 min-w-[44px] min-h-[44px] items-center justify-center pl-2.5 pr-2.5 outline-none active:opacity-70 self-stretch"
+        className="flex shrink-0 w-[44px] h-full items-center justify-center outline-none active:opacity-70"
         aria-label="Clear search"
       >
         <X className="h-[18px] w-[18px] text-cl-text" strokeWidth={2} />

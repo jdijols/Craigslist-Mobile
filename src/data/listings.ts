@@ -21,9 +21,9 @@ export type PostDetailVariantId = "dresser" | "apartment";
 export const postDetailVariants: Record<PostDetailVariantId, PostDetailVariant> = {
   dresser: {
     id: "dresser",
-    image: "/assets/listing-dresser.svg",
+    image: "https://images.unsplash.com/photo-1758443487060-460f8162c282?w=400&h=400&fit=crop&auto=format&q=80",
     images: [
-      "/assets/listing-dresser.svg",
+      "https://images.unsplash.com/photo-1758443487060-460f8162c282?w=400&h=400&fit=crop&auto=format&q=80",
       "https://images.unsplash.com/photo-1771039753570-b3a1ddf868ab?w=400&h=400&fit=crop&auto=format&q=80",
     ],
     price: "$275",

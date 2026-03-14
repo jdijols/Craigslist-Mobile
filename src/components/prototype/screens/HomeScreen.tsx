@@ -375,7 +375,7 @@ export function HomeScreen({
             </button>
 
             {searchTerm ? (
-              <div className="flex min-w-0 flex-1 justify-end">
+              <div className="flex items-center min-w-0 flex-1 justify-end animate-[fadein_120ms_ease-out]">
                 <SearchChip
                   term={searchTerm}
                   onClear={() => onClearSearch?.()}

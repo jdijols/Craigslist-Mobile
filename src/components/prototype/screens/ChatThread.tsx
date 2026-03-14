@@ -2,14 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, Send } from "lucide-react";
 import type { ScreenId } from "../types";
 import type { ChatThread as ChatThreadData } from "../../../data/chats";
-import { addMessageToThread } from "../../../data/chats";
+import { addMessageToThread, useChatThreads } from "../../../data/chats";
 
 interface ChatThreadProps {
   thread: ChatThreadData;
   onNavigate?: (screen: ScreenId) => void;
+  onOpenListing?: () => void;
 }
 
-export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
+export function ChatThread({ thread: threadProp, onNavigate, onOpenListing }: ChatThreadProps) {
+  const allThreads = useChatThreads();
+  const thread = allThreads.find((t) => t.id === threadProp.id) ?? threadProp;
   const [draft, setDraft] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerPaddingTop = 44;
@@ -39,22 +42,26 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
         >
           <ChevronLeft className="h-6 w-6 text-cl-accent" strokeWidth={1.8} />
         </button>
-        <div className="min-w-0 flex-1">
+        <button
+          type="button"
+          className="min-w-0 flex-1 text-left outline-none active:opacity-70"
+          onClick={onOpenListing}
+        >
           <p className="text-[14px] font-semibold text-cl-text truncate">
             {thread.listingTitle}
           </p>
           <p className="text-[10px] text-cl-text-muted truncate">
             {thread.listingCategory}{thread.listingSubcategory ? ` › ${thread.listingSubcategory}` : ""}
           </p>
-        </div>
+        </button>
         </div>
       </div>
 
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-none"
-        style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}
+        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-4 space-y-3 scrollbar-none"
+        style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop + 16}px)` }}
       >
         {thread.messages.map((msg) => (
           <div
@@ -62,10 +69,10 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
             className={`flex ${msg.fromUser ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[75%] rounded-2xl px-3.5 py-2.5 ${
+              className={`max-w-[75%] rounded-[--radius-card-lg] px-3.5 py-2.5 ${
                 msg.fromUser
-                  ? "rounded-br-md bg-cl-accent text-white"
-                  : "rounded-bl-md bg-cl-surface border border-cl-border text-cl-text"
+                  ? "rounded-br-[--radius-card] bg-cl-accent text-white"
+                  : "rounded-bl-[--radius-card] bg-cl-surface border border-cl-border text-cl-text"
               }`}
             >
               <p className="text-[14px] leading-relaxed">{msg.text}</p>
@@ -82,8 +89,8 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
       </div>
 
       {/* Input bar */}
-      <div className="flex items-center gap-2 border-t-[0.5px] border-cl-border bg-cl-surface px-4 py-3">
-        <div className="flex flex-1 items-center rounded-full border-2 border-cl-border bg-cl-surface px-4 min-h-[44px] focus-within:border-cl-accent transition-colors">
+      <div className="flex items-center gap-2 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3 pb-[34px]">
+        <div className="flex flex-1 items-center rounded-[--radius-card] bg-cl-bg-secondary px-4 min-h-[44px] transition-colors">
           <input
             type="text"
             value={draft}
@@ -96,7 +103,7 @@ export function ChatThread({ thread, onNavigate }: ChatThreadProps) {
         <button
           type="button"
           onClick={handleSend}
-          className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-cl-accent shadow-[--shadow-card] active:opacity-90"
+          className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[--radius-button] bg-cl-accent shadow-[--shadow-card] active:opacity-90"
         >
           <Send className="h-5 w-5 text-cl-accent-text" />
         </button>

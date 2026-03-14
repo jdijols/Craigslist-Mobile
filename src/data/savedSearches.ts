@@ -62,6 +62,34 @@ export function useSavedSearches(): SavedSearch[] {
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
+/** Check whether a category+subcategory combo is already saved. */
+export function isSavedSubcategory(category: string, subcategory: string): boolean {
+  return savedSearches.some(
+    (s) => s.category === category && s.subcategory === subcategory && !s.searchTerm
+  );
+}
+
+/** Toggle a subcategory as a saved search (no search term / filters). */
+export function toggleSavedSubcategory(category: string, subcategory: string) {
+  const existing = savedSearches.find(
+    (s) => s.category === category && s.subcategory === subcategory && !s.searchTerm
+  );
+  if (existing) {
+    removeSavedSearch(existing.id);
+  } else {
+    addSavedSearch({ category, subcategory });
+  }
+}
+
+/** Reactive hook for isSavedSubcategory. */
+export function useIsSavedSubcategory(category?: string, subcategory?: string): boolean {
+  const searches = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  if (!category || !subcategory) return false;
+  return searches.some(
+    (s) => s.category === category && s.subcategory === subcategory && !s.searchTerm
+  );
+}
+
 export function formatSavedDetail(s: SavedSearch): string {
   const parts: string[] = [];
   if (s.searchTerm) parts.push(`"${s.searchTerm}"`);

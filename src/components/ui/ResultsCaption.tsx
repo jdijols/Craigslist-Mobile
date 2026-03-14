@@ -6,7 +6,7 @@ interface ResultsCaptionProps {
 
 export function ResultsCaption({ children }: ResultsCaptionProps) {
   return (
-    <p className="text-center text-[13px] font-medium text-cl-text py-1.5">
+    <p className="text-center text-[13px] font-medium text-cl-text py-2">
       {children}
     </p>
   );

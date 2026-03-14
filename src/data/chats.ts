@@ -9,9 +9,11 @@ export interface ChatMessage {
 
 export interface ChatThread {
   id: string;
+  listingId: string;
   posterName: string;
   posterInitial: string;
   listingTitle: string;
+  listingImage?: string;
   listingCategory: string;
   listingSubcategory: string;
   lastMessage: string;
@@ -23,9 +25,11 @@ export interface ChatThread {
 let threads: ChatThread[] = [
   {
     id: "thread-dresser",
+    listingId: "dresser",
     posterName: "mid-century modern dresser",
     posterInitial: "M",
     listingTitle: "mid-century modern dresser",
+    listingImage: "https://images.unsplash.com/photo-1758443487060-460f8162c282?w=200&h=200&fit=crop&auto=format&q=80",
     listingCategory: "for sale",
     listingSubcategory: "furniture",
     lastMessage: "yes! it's still available. want to come see it this weekend?",
@@ -48,9 +52,11 @@ let threads: ChatThread[] = [
   },
   {
     id: "thread-apartment",
+    listingId: "apartment",
     posterName: "2br uptown apartment",
     posterInitial: "2",
     listingTitle: "2br uptown apartment",
+    listingImage: "https://images.unsplash.com/photo-1638454668466-e8dbd5462f20?w=400&h=400&fit=crop&auto=format&q=80",
     listingCategory: "housing",
     listingSubcategory: "apartments / housing for rent",
     lastMessage: "the unit is available for a showing thursday after 5pm",
@@ -85,9 +91,11 @@ let threads: ChatThread[] = [
   },
   {
     id: "thread-phone",
+    listingId: "phone",
     posterName: "iphone 14 pro - refurbished",
     posterInitial: "I",
     listingTitle: "iphone 14 pro - refurbished",
+    listingImage: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=400&fit=crop&auto=format&q=80",
     listingCategory: "for sale",
     listingSubcategory: "cell phones",
     lastMessage: "sounds good, i'll hold it for you until tomorrow",
@@ -132,6 +140,15 @@ export function useChatThreads(): ChatThread[] {
 }
 
 let nextMsgId = 100;
+
+export function findThreadByListingId(listingId: string): ChatThread | undefined {
+  return threads.find((t) => t.listingId === listingId);
+}
+
+export function resetChats() {
+  threads = [];
+  emit();
+}
 
 export function addChatThread(thread: ChatThread) {
   threads = [thread, ...threads];

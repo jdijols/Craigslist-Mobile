@@ -129,6 +129,7 @@ export function SearchScreen({
     (term: string) => {
       const trimmed = term.trim();
       if (!trimmed) return;
+      inputRef.current?.blur();
       if (onSubmitSearch) {
         onSubmitSearch(trimmed);
       } else {
@@ -139,6 +140,7 @@ export function SearchScreen({
   );
 
   const handleCancel = useCallback(() => {
+    inputRef.current?.blur();
     if (onCancelSearch) {
       onCancelSearch();
     } else {
@@ -258,7 +260,7 @@ export function SearchScreen({
           <div style={{ height: 4 }} aria-hidden />
           <div className="flex h-header-bar items-center gap-2 px-4">
             <div
-              className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input cursor-text focus-within:border-cl-accent transition-colors"
+              className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] bg-cl-bg-secondary px-3 h-search-input cursor-text"
               onClick={() => inputRef.current?.focus()}
             >
               <SearchIcon className="h-4 w-4 shrink-0 text-cl-text-muted pointer-events-none" />
@@ -283,7 +285,7 @@ export function SearchScreen({
                   className="flex shrink-0 items-center justify-center rounded-full bg-cl-text-muted/80 p-[2px] outline-none active:opacity-70"
                   aria-label="Clear text"
                 >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-white">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-cl-bg">
                     <path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 </button>
@@ -311,7 +313,7 @@ export function SearchScreen({
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => setConfirmAction({ kind: "clear-recent" })}
-                    className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
+                    className="text-[13px] font-medium text-cl-text outline-none active:opacity-70 whitespace-nowrap"
                   >
                     reset recent
                   </button>
@@ -320,7 +322,7 @@ export function SearchScreen({
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => setConfirmAction({ kind: "clear-saved" })}
-                    className="text-[13px] font-medium text-cl-accent outline-none active:opacity-70 whitespace-nowrap"
+                    className="text-[13px] font-medium text-cl-text outline-none active:opacity-70 whitespace-nowrap"
                   >
                     reset saved
                   </button>

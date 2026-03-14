@@ -167,7 +167,7 @@ export function LocationPicker({
   );
 
   const headerContent = (
-    <div className="flex items-center gap-2.5 rounded-[--radius-button] border-2 border-cl-border bg-cl-surface px-3 h-search-input focus-within:border-cl-accent transition-colors">
+    <div className="flex items-center gap-2.5 rounded-[--radius-button] bg-cl-bg-secondary px-3 h-search-input transition-colors">
       <Search className="h-4 w-4 shrink-0 text-cl-text-muted" />
       <input
         ref={inputRef}
@@ -198,7 +198,7 @@ export function LocationPicker({
             height="14"
             viewBox="0 0 14 14"
             fill="none"
-            className="text-white"
+            className="text-cl-bg"
           >
             <path
               d="M4 4l6 6M10 4l-6 6"

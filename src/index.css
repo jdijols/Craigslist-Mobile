@@ -17,23 +17,30 @@
   --color-lf-green: #67a300;
   --color-lf-teal: #073b3a;
 
-  /* ── Craigslist brand (kept for in-phone mockups) ── */
+  /* ── Craigslist brand (kept for in-phone mockups) ──
+     Neutral palette (4 colors × 2 modes = 8) + 3 accents (× 2 modes = 6) = 14 unique hex values
+     cl-white:     Light #FFFFFF / Dark #f1f1f1  — surfaces (light), text (dark)
+     cl-grey-bg:   Light #f4f4f4 / Dark #272727  — page bg, borders, secondary
+     cl-grey-text: Light #606060 / Dark #AAAAAA  — muted/secondary text
+     cl-black:     Light #0f0f0f / Dark #0f0f0f  — text (light), surfaces (dark)
+     Accents: cl-purple (#7A1FA2/#AD6FF5), cl-red (#B71C1C/#E57373), cl-yellow (#FACC15) */
   --color-cl-purple: #7A1FA2;
   --color-cl-purple-secondary: #7A1FA2;
   --color-cl-purple-light: #7A1FA2;
   --color-cl-purple-rgb: 122, 31, 162;
-  --color-cl-bg: #FAFAFA;
-  --color-cl-surface: #ffffff;
-  --color-cl-border: #d9d9d9;
-  --color-cl-text: #111111;
-  --color-cl-text-muted: #6D6D6D;
+  --color-cl-bg: #f4f4f4;
+  --color-cl-surface: #FFFFFF;
+  --color-cl-border: #f4f4f4;
+  --color-cl-text: #0f0f0f;
+  --color-cl-text-muted: #606060;
+  --color-cl-icon-inactive: #AAAAAA;
   --color-cl-accent: #7A1FA2;
-  --color-cl-price: #111111;
-  --color-cl-bg-secondary: #f2f2f2;
+  --color-cl-price: #0f0f0f;
+  --color-cl-bg-secondary: #f4f4f4;
   --color-cl-destructive: #B71C1C;
-  --color-cl-favorite: #FACC15;
-  --color-cl-active: #e5e5ea;
-  --color-cl-accent-text: #ffffff;
+  --color-cl-favorite: #eabd08;
+  --color-cl-active: #f4f4f4;
+  --color-cl-accent-text: #FFFFFF;
 
   /* ── Slide-level tokens (Livefront-branded) ── */
   --color-slide-bg: #f9fafb;
@@ -65,22 +72,22 @@
   --shadow-sheet: 0 -4px 20px rgba(0, 0, 0, 0.12);
 
   /* ── Map tokens (light) ── */
-  --color-cl-map-bg: #e8e4df;
-  --color-cl-map-road: #d4d0cb;
-  --color-cl-map-road-minor: #ddd8d3;
+  --color-cl-map-bg: #f4f4f4;
+  --color-cl-map-road: #f4f4f4;
+  --color-cl-map-road-minor: #f4f4f4;
   --color-cl-map-water: #b8d4e8;
   --color-cl-map-water-inner: #a8c8de;
   --color-cl-map-park: #c8dbb8;
-  --color-cl-map-highway: #ccc7c1;
-  --color-cl-map-label: #9e998f;
+  --color-cl-map-highway: #f4f4f4;
+  --color-cl-map-label: #606060;
 
   /* ── Image overlay tokens ── */
   --color-cl-overlay-bg: rgba(255, 255, 255, 0.92);
   --color-cl-overlay-bg-light: rgba(255, 255, 255, 0.80);
 
   /* ── Standalone prototype wrapper & cover ── */
-  --standalone-bg: linear-gradient(145deg, rgba(var(--color-cl-purple-rgb), 0.10) 0%, rgba(var(--color-cl-purple-rgb), 0.07) 100%), #f9fafb;
-  --standalone-cover-bg: rgb(249, 250, 251);
+  --standalone-bg: linear-gradient(145deg, rgba(var(--color-cl-purple-rgb), 0.10) 0%, rgba(var(--color-cl-purple-rgb), 0.07) 100%), #f4f4f4;
+  --standalone-cover-bg: rgb(244, 244, 244);
 }
 
 /* Status bar / home indicator tint: matches header (locator bar) for immersive edge-to-edge */
@@ -96,74 +103,80 @@ body {
   /* Outer chrome (body, presentation area) */
   body {
     background-color: var(--status-bar-bg);
-    color: #e4e4e7;
+    color: #f1f1f1;
   }
 
   /* Apply dark tokens globally so prototype (with or without phone frame) and status bar inherit */
   :root {
-    --status-bar-bg: #000000;
+    --status-bar-bg: #0f0f0f;
     --color-cl-purple: #AD6FF5;
     --color-cl-purple-secondary: #AD6FF5;
     --color-cl-purple-light: #AD6FF5;
     --color-cl-purple-rgb: 173, 111, 245;
-    --color-cl-bg: #181818;
-    --color-cl-surface: #000000;
-    --color-cl-border: #38383A;
-    --color-cl-text: #F5F5F7;
-    --color-cl-text-muted: #78787E;
+    --color-cl-bg: #272727;
+    --color-cl-surface: #0f0f0f;
+    --color-cl-border: #272727;
+    --color-cl-text: #f1f1f1;
+    --color-cl-text-muted: #AAAAAA;
+    --color-cl-icon-inactive: #606060;
     --color-cl-accent: #AD6FF5;
-    --color-cl-price: #F5F5F7;
-    --color-cl-bg-secondary: #1A1A1C;
+    --color-cl-price: #f1f1f1;
+    --color-cl-bg-secondary: #272727;
     --color-cl-destructive: #E57373;
     --color-cl-favorite: #FACC15;
-    --color-cl-active: #2E2E32;
-    --color-cl-accent-text: #000000;
+    --color-cl-active: #272727;
+    --color-cl-accent-text: #0f0f0f;
 
-    --color-cl-map-bg: #1a1a1e;
-    --color-cl-map-road: #2c2c30;
-    --color-cl-map-road-minor: #242428;
+    --color-cl-map-bg: #0f0f0f;
+    --color-cl-map-road: #272727;
+    --color-cl-map-road-minor: #272727;
     --color-cl-map-water: #0f2a40;
     --color-cl-map-water-inner: #143350;
     --color-cl-map-park: #1a2e1a;
-    --color-cl-map-highway: #3a3a3e;
-    --color-cl-map-label: #808088;
+    --color-cl-map-highway: #272727;
+    --color-cl-map-label: #AAAAAA;
 
-    --color-cl-overlay-bg: rgba(0, 0, 0, 0.92);
-    --color-cl-overlay-bg-light: rgba(0, 0, 0, 0.80);
+    --color-cl-overlay-bg: rgba(15, 15, 15, 0.92);
+    --color-cl-overlay-bg-light: rgba(15, 15, 15, 0.80);
 
     --shadow-card: 0 3px 12px rgba(0, 0, 0, 0.3);
     --shadow-elevated: 0 6px 24px rgba(0, 0, 0, 0.5);
     --shadow-sheet: 0 -4px 20px rgba(0, 0, 0, 0.4);
 
-    --standalone-bg: linear-gradient(145deg, rgba(var(--color-cl-purple-rgb), 0.08) 0%, rgba(var(--color-cl-purple-rgb), 0.04) 100%), #0a0a0c;
-    --standalone-cover-bg: rgb(10, 10, 12);
+    --standalone-bg: linear-gradient(145deg, rgba(var(--color-cl-purple-rgb), 0.08) 0%, rgba(var(--color-cl-purple-rgb), 0.04) 100%), #0f0f0f;
+    --standalone-cover-bg: rgb(15, 15, 15);
+  }
+
+  /* Presentation slides are always light — keep primary dark purple */
+  .bg-slide-bg {
+    --color-cl-purple-secondary: #7A1FA2;
   }
 }
 
 /* Standalone cover — light text when overlay is dark */
 @media (prefers-color-scheme: dark) {
   .standalone-cover-content {
-    color: #a1a1aa;
+    color: #AAAAAA;
   }
   .standalone-cover-content h1,
   .standalone-cover-content .text-lf-navy {
-    color: #e4e4e7;
+    color: #f1f1f1;
   }
   .standalone-cover-content .text-cl-purple-secondary {
-    color: #ad6ff5;
+    color: #AD6FF5;
   }
   .standalone-cover-content a {
-    color: #a1a1aa;
+    color: #AAAAAA;
   }
   .standalone-cover-content a:hover {
-    color: #e4e4e7;
+    color: #f1f1f1;
   }
   .standalone-cover-content .standalone-cover-footer,
   .standalone-cover-content .standalone-cover-footer a {
-    color: #a1a1aa;
+    color: #AAAAAA;
   }
   .standalone-cover-content button {
-    color: #e4e4e7;
+    color: #f1f1f1;
     border-color: rgba(255, 255, 255, 0.2);
   }
   .standalone-cover-content button:hover {
@@ -396,6 +409,11 @@ body {
   cursor: pointer;
   border: none;
   box-shadow: none;
+}
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 @media (prefers-color-scheme: dark) {

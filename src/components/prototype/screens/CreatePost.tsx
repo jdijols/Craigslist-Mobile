@@ -81,7 +81,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
 
             {/* Form fields */}
             <div className="mx-4 mt-4 space-y-3">
-              <div className="rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
+              <div className="rounded-[--radius-card] bg-cl-bg-secondary px-4 py-3 min-h-[44px] transition-colors">
                 <label className="text-[11px] text-cl-text-muted" htmlFor="cp-title">title</label>
                 <input
                   id="cp-title"
@@ -93,7 +93,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
                 />
               </div>
               <div className="flex gap-3">
-                <div className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
+                <div className="flex-1 rounded-[--radius-card] bg-cl-bg-secondary px-4 py-3 min-h-[44px] transition-colors">
                   <label className="text-[11px] text-cl-text-muted" htmlFor="cp-price">price</label>
                   <div className="mt-0.5 flex items-center">
                     <span className="text-[15px] text-cl-price">$</span>
@@ -108,7 +108,7 @@ export function CreatePost({ onNavigate, onDismiss }: CreatePostProps) {
                     />
                   </div>
                 </div>
-                <div className="flex-1 rounded-[--radius-card] border-2 border-cl-border bg-cl-surface px-4 py-3 min-h-[44px] focus-within:border-cl-accent transition-colors">
+                <div className="flex-1 rounded-[--radius-card] bg-cl-bg-secondary px-4 py-3 min-h-[44px] transition-colors">
                   <label className="text-[11px] text-cl-text-muted" htmlFor="cp-category">category</label>
                   <select
                     id="cp-category"

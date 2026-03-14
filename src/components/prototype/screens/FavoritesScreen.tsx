@@ -2,19 +2,20 @@ import { useState, useMemo } from "react";
 import {
   Star,
   Search,
-  Trash2,
   Map as MapIcon,
   LayoutList,
   SlidersHorizontal,
+  ArrowUpDown,
 } from "lucide-react";
 import type { ViewMode, ListingData } from "../../ui/cards";
-import { useFavorites, removeFavorite, resetFavorites } from "../../../data/favorites";
+import { useFavorites, resetFavorites } from "../../../data/favorites";
 import { useOverlayFade } from "../../../hooks/useOverlayFade";
 import { ShareIcon } from "../../ui/ShareIcon";
 import { ShareSheet } from "../components/ShareSheet";
 import { ConfirmDialog } from "../components/ConfirmDialog";
-import { SortFilterDrawer, DEFAULT_SORT, DEFAULT_DISTANCE, type SortOption } from "../components/SortFilterDrawer";
+import { SortFilterDrawer, DEFAULT_SORT, DEFAULT_DISTANCE, type SortOption, type FilterSection } from "../components/SortFilterDrawer";
 import { ViewModeDrawer } from "../components/ViewModeDrawer";
+import { ThumbCard } from "../../ui/cards/ThumbCard";
 import { GridCard } from "../../ui/cards/GridCard";
 import { ListCard } from "../../ui/cards/ListCard";
 import { GalleryCard } from "../../ui/cards/GalleryCard";
@@ -41,9 +42,12 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
   const [activeDistance, setActiveDistance] = useState(DEFAULT_DISTANCE);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [filterInitialSections, setFilterInitialSections] = useState<FilterSection[] | undefined>();
   const { overlayVisible, handleOverlayScroll } = useOverlayFade();
   const { selectedLocation } = useLocation();
   const isMapView = viewMode === "map";
+  const hasActiveSort = activeSort !== DEFAULT_SORT;
+  const hasActiveFilters = activeDistance !== DEFAULT_DISTANCE || !!minPrice || !!maxPrice;
   const nav = (item: ListingData) => onOpenListing?.(item);
 
   const filteredFavorites = useMemo(() => {
@@ -136,14 +140,14 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
                   onClick={() => setConfirmResetOpen(true)}
                   className="text-right text-[13px] font-medium text-cl-purple outline-none active:opacity-70"
                 >
-                  reset favorites
+                  reset
                 </button>
               </div>
 
               {viewMode === "thumb" && (
                 <div className="space-y-0.5">
                   {filteredFavorites.map((item) => (
-                    <FavoriteThumbRow key={item.id} item={item} onOpenListing={onOpenListing} />
+                    <ThumbCard key={item.id} data={item} onClick={() => nav(item)} />
                   ))}
                 </div>
               )}
@@ -178,13 +182,12 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
 
           {/* Bottom-left: Change view */}
           <div
-            className={`absolute bottom-[84px] left-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
-            style={{ height: 40 }}
+            className={`absolute bottom-[84px] left-3 z-20 flex min-w-[44px] min-h-[44px] w-11 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "-translate-x-[calc(100%+12px)]"}`}
           >
             <button
               type="button"
               onClick={() => setViewDrawerOpen(true)}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Change view"
             >
               {isMapView ? (
@@ -195,24 +198,52 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
             </button>
           </div>
 
-          {/* Bottom-right: Filter + Share */}
+          {/* Bottom-right: Sort + Filter + Share */}
           <div
-            className={`absolute bottom-[84px] right-3 z-20 flex w-10 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
-            style={{ height: 80 }}
+            className={`absolute bottom-[84px] right-3 z-20 flex min-w-[44px] w-11 flex-col overflow-hidden rounded-[--radius-button] bg-cl-surface/90 shadow-md backdrop-blur-[6px] transition-transform duration-300 ease-in-out ${overlayVisible ? "translate-x-0" : "translate-x-[calc(100%+12px)]"}`}
+            style={{ minHeight: isMapView ? 80 : 120 }}
           >
+            {!isMapView && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilterInitialSections(["sort"]);
+                    setShowFilters(true);
+                  }}
+                  className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
+                  aria-label="Sort"
+                >
+                  <div className="relative">
+                    <ArrowUpDown className={`h-5 w-5 shrink-0 ${hasActiveSort ? "text-cl-accent" : "text-cl-text"}`} />
+                    {hasActiveSort && <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-cl-accent" />}
+                  </div>
+                </button>
+                <div className="shrink-0 border-t-[0.5px] border-cl-border" />
+              </>
+            )}
             <button
               type="button"
-              onClick={() => setShowFilters(true)}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              onClick={() => {
+                const sections: FilterSection[] = [];
+                if (activeDistance !== DEFAULT_DISTANCE) sections.push("distance");
+                if (minPrice || maxPrice) sections.push("price");
+                setFilterInitialSections(sections.length > 0 ? sections : undefined);
+                setShowFilters(true);
+              }}
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Filter"
             >
-              <SlidersHorizontal className="h-5 w-5 shrink-0 text-cl-text" />
+              <div className="relative">
+                <SlidersHorizontal className={`h-5 w-5 shrink-0 ${hasActiveFilters ? "text-cl-accent" : "text-cl-text"}`} />
+                {hasActiveFilters && <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-cl-accent" />}
+              </div>
             </button>
             <div className="shrink-0 border-t-[0.5px] border-cl-border" />
             <button
               type="button"
               onClick={() => setShareOpen(true)}
-              className="flex flex-1 w-full items-center justify-center outline-none"
+              className="flex flex-1 w-full min-h-[44px] min-w-[44px] items-center justify-center outline-none"
               aria-label="Share"
             >
               <ShareIcon className="h-5 w-5 text-cl-text shrink-0" />
@@ -244,7 +275,11 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
       {/* Sort & filter drawer */}
       <SortFilterDrawer
         open={showFilters}
-        onClose={() => setShowFilters(false)}
+        onClose={() => {
+          setShowFilters(false);
+          setFilterInitialSections(undefined);
+        }}
+        initialSections={filterInitialSections}
         activeSort={activeSort}
         onSortChange={setActiveSort}
         activeDistance={activeDistance}
@@ -272,45 +307,3 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
   );
 }
 
-function FavoriteThumbRow({
-  item,
-  onOpenListing,
-}: {
-  item: ReturnType<typeof useFavorites>[number];
-  onOpenListing?: (listing: ListingData) => void;
-}) {
-  return (
-    <div className="flex w-full items-center gap-3 bg-cl-surface px-3 py-2.5">
-      <button
-        type="button"
-        onClick={() => onOpenListing?.(item)}
-        className="flex flex-1 min-w-0 items-center gap-3 text-left outline-none"
-      >
-        <img
-          src={item.image}
-          alt={item.title}
-          className="h-16 w-16 shrink-0 rounded-[--radius-card] object-cover"
-        />
-        <div className="min-w-0 flex-1">
-          {item.price && (
-            <p className="text-[14px] font-bold text-cl-price">{item.price}</p>
-          )}
-          <p className="text-[14px] text-cl-text line-clamp-2">
-            {item.title}
-          </p>
-          <p className="mt-0.5 text-[12px] text-cl-text-muted truncate">
-            {[item.hood, item.dist, item.time].filter(Boolean).join(" · ")}
-          </p>
-        </div>
-      </button>
-      <button
-        type="button"
-        onClick={() => removeFavorite(item.id)}
-        className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-[--radius-button] outline-none active:opacity-70"
-        aria-label={`Remove ${item.title} from favorites`}
-      >
-        <Trash2 className="h-5 w-5 text-cl-destructive" />
-      </button>
-    </div>
-  );
-}

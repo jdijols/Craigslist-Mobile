@@ -89,7 +89,7 @@ export function ConfirmDialog({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex w-full min-h-[44px] items-center justify-center text-[17px] font-semibold text-cl-accent outline-none active:bg-cl-active"
+                className="flex w-full min-h-[44px] items-center justify-center text-[17px] font-semibold text-cl-text outline-none active:bg-cl-active"
               >
                 cancel
               </button>
