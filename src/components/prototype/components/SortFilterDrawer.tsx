@@ -70,7 +70,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
     <AnimatePresence>
       {open && (
         <div
-          className="absolute inset-0"
+          className="fixed inset-0"
           style={{ pointerEvents: "auto" }}
         >
           {/* Backdrop */}
@@ -79,7 +79,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={OVERLAY_FADE}
-            className="absolute inset-0 bg-black/40"
+            className="fixed inset-0 bg-black/40"
             onClick={onClose}
             aria-label="Close sort & filter"
           />
@@ -90,8 +90,8 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={SPRING_SHEET}
-            className="absolute top-0 bottom-0 right-0 flex flex-col border-l border-cl-border pt-[54px] bg-cl-surface"
-            style={{ width: `${DRAWER_WIDTH_PERCENT}%` }}
+            className="fixed top-0 bottom-0 right-0 flex flex-col border-l border-cl-border bg-cl-surface"
+            style={{ width: `${DRAWER_WIDTH_PERCENT}%`, paddingTop: "max(54px, calc(env(safe-area-inset-top, 44px) + 10px))" }}
           >
             {/* Fixed header */}
             <div className="flex min-h-[44px] shrink-0 items-center justify-between px-5 bg-cl-surface">
@@ -181,7 +181,7 @@ export function SortFilterDrawer({ open, onClose, activeSort, onSortChange, acti
               </CollapsibleSection>
 
               {/* ── Apply ── */}
-              <div className="px-5 pt-4 pb-8">
+              <div className="px-5 pt-4" style={{ paddingBottom: "max(32px, env(safe-area-inset-bottom, 32px))" }}>
                 <button
                   type="button"
                   onClick={onClose}

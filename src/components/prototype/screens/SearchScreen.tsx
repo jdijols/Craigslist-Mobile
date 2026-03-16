@@ -95,8 +95,8 @@ export function SearchScreen({
     }
   }, [isTyping, activeTab]);
 
-  /** Option C: when typing, 48px (4px gap + search bar). When !typing, fixed 92px (4px gap + search bar + 44px buffer). Recent/saved row overlays buffer. */
-  const headerPaddingTop = isTyping ? 52 : 96;
+  /** When typing, 44px (search bar). When !typing, 88px (44 header + 44 recent/saved row). */
+  const headerPaddingTop = isTyping ? 44 : 88;
 
   const handleContentScroll = useCallback((e: UIEvent<HTMLDivElement>) => {
     if (isTyping) return;
@@ -257,7 +257,6 @@ export function SearchScreen({
           className={`bg-cl-surface ${isTyping || headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
         >
           <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
-          <div style={{ height: 4 }} aria-hidden />
           <div className="flex h-header-bar items-center gap-2 px-4">
             <div
               className="flex flex-1 items-center gap-2.5 rounded-[--radius-button] bg-cl-bg-secondary px-3 h-search-input cursor-text"
@@ -299,7 +298,7 @@ export function SearchScreen({
         {!isTyping && (
           <div
             className={`absolute left-0 right-0 z-10 overflow-hidden bg-cl-surface ${!headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
-            style={{ top: "calc(var(--safe-area-top) + 4px + 44px)" }}
+            style={{ top: "calc(var(--safe-area-top) + 44px)" }}
           >
             <CategoryRow
               labels={SEARCH_TABS}

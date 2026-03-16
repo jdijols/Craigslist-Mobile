@@ -368,8 +368,8 @@ export function HomeScreen({
     [activeCategory, activeSubcategory],
   );
 
-  /** Option C: fixed 96px (4px gap + 48 header bar + 44 buffer). Category row overlays the buffer when expanded. */
-  const headerPaddingTop = 96;
+  /** 88px (44 header + 44 category). Category row overlays the buffer when expanded. */
+  const headerPaddingTop = 88;
 
   return (
     <div className="relative h-full">
@@ -380,7 +380,6 @@ export function HomeScreen({
           className={`bg-cl-surface ${headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
         >
           <div style={{ height: "var(--safe-area-top)" }} aria-hidden />
-          <div style={{ height: 4 }} aria-hidden />
           <div className="flex h-header-bar items-center gap-3 pl-1.5 pr-4">
             <button
               type="button"
@@ -420,7 +419,7 @@ export function HomeScreen({
         {/* Layer 2: category row overlay — overlays the 44px buffer in scroll content (4px overlap eliminates gap) */}
         <div
           className={`absolute left-0 right-0 z-10 overflow-hidden bg-cl-surface ${!headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
-          style={{ top: "calc(var(--safe-area-top) + 4px + 44px)" }}
+          style={{ top: "calc(var(--safe-area-top) + 44px)" }}
         >
           <CategoryRow
             labels={chipLabels}

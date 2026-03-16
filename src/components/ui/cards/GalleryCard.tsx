@@ -5,6 +5,8 @@ import { CardFavoriteButton } from "./CardFavoriteButton";
 const GESTURE_GAP_MS = 150;
 const NAV_COOLDOWN_MS = 1000;
 const POST_NAV_MIN_DELTA = 30;
+const SWIPE_THRESHOLD = 30;
+const SWIPE_LOCK_ANGLE = 1.2; /* dx/dy ratio above which we treat as horizontal */
 
 interface GalleryCardProps {
   data: ListingData;
@@ -32,6 +34,9 @@ export function GalleryCard({ data, onClick }: GalleryCardProps) {
     },
     [images.length],
   );
+
+  /* ── Touch swipe state ── */
+  const touchRef = useRef<{ startX: number; startY: number; locked: boolean; swiped: boolean } | null>(null);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -71,8 +76,56 @@ export function GalleryCard({ data, onClick }: GalleryCardProps) {
       goTo(cur + (delta > 0 ? 1 : -1));
     };
 
+    /* ── Touch handlers for iPhone ── */
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      touchRef.current = { startX: t.clientX, startY: t.clientY, locked: false, swiped: false };
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      const tr = touchRef.current;
+      if (!tr || tr.swiped) return;
+      const t = e.touches[0];
+      const dx = t.clientX - tr.startX;
+      const dy = t.clientY - tr.startY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      // Once we know the direction, lock it
+      if (!tr.locked && (absDx > 8 || absDy > 8)) {
+        tr.locked = true;
+        if (absDx < absDy * SWIPE_LOCK_ANGLE) {
+          // Vertical scroll — bail out
+          touchRef.current = null;
+          return;
+        }
+      }
+      if (!tr.locked) return;
+
+      // Horizontal swipe — prevent vertical scroll
+      e.preventDefault();
+
+      if (absDx >= SWIPE_THRESHOLD) {
+        tr.swiped = true;
+        const cur = indexRef.current;
+        goTo(cur + (dx < 0 ? 1 : -1));
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchRef.current = null;
+    };
+
     el.addEventListener("wheel", handleWheel, { passive: false });
-    return () => el.removeEventListener("wheel", handleWheel);
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      el.removeEventListener("wheel", handleWheel);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+    };
   }, [images.length, goTo]);
 
   return (

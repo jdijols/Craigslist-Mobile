@@ -59,7 +59,7 @@
   --spacing-search-input: 36px;
   --spacing-header-bar: 48px;
   --spacing-header-category: 44px;
-  --spacing-header-total: 92px; /* header-bar + category row */
+  --spacing-header-total: 88px; /* 44 header + 44 category row */
 
   /* ── Radii ── */
   --radius-card: 4px;

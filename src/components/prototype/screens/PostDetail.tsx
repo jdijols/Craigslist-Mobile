@@ -43,8 +43,21 @@ const VELOCITY_DOWN_THRESHOLD = 350;
 const VELOCITY_UP_THRESHOLD = 350;
 /** Max movement (px) to treat as a click rather than drag */
 const CLICK_THRESHOLD = 8;
-/** Min swipe distance (px) for magnet: scroll past last image → expand */
-const MAGNET_SWIPE_THRESHOLD = 30;
+/** Momentum decay per frame (0–1, higher = more glide) */
+const MOMENTUM_DECAY = 0.95;
+/** Stop momentum when velocity drops below this (px/frame) */
+const MOMENTUM_STOP = 0.5;
+/** Delay (ms) after last wheel event to snap the sheet */
+const WHEEL_SNAP_DELAY = 150;
+
+interface GestureData {
+  active: boolean;
+  startClientY: number;
+  prevClientY: number;
+  prevTime: number;
+  didMove: boolean;
+  samples: Array<{ dy: number; dt: number }>;
+}
 
 interface PostDetailProps {
   onNavigate?: (screen: ScreenId) => void;
@@ -140,34 +153,66 @@ export function PostDetail({
   /* ── Sheet snap state ── */
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const sheetY = useMotionValue(0);
   const [snapIdx, setSnapIdx] = useState(1);
   const [ready, setReady] = useState(false);
 
   const [containerH, setContainerH] = useState(700);
   const [containerW, setContainerW] = useState(390);
-  const [chromeOff, setChromeOff] = useState(47);
   const [modalExtendsUp, setModalExtendsUp] = useState(0);
   const [safeAreaTop, setSafeAreaTop] = useState(44);
+  const [firstImageH, setFirstImageH] = useState<number | null>(null);
+  const sheetHeaderRef = useRef<HTMLDivElement>(null);
+  const [sheetHeaderH, setSheetHeaderH] = useState(70);
 
   const snapPoints = useMemo(() => {
     const overlayBottom = safeAreaTop + OVERLAY_BTN_GAP + modalExtendsUp + OVERLAY_BTN_H;
     const fullSnap = overlayBottom + OVERLAY_GAP;
-    const allImagesBottom = chromeOff + Math.round(containerW * 0.75) * images.length;
+    const imageH = firstImageH ?? Math.round(containerW * 0.75);
+    const firstImageBottom = modalExtendsUp + imageH;
+    const allImagesBottom = modalExtendsUp + imageH * images.length;
     const maxDefault = containerH - CTA_H - HEADER_H;
-    const defaultSnap = Math.min(allImagesBottom, maxDefault);
+    const defaultSnap = Math.max(firstImageBottom, Math.min(allImagesBottom, maxDefault));
     return [fullSnap, defaultSnap];
-  }, [containerH, containerW, chromeOff, modalExtendsUp, safeAreaTop, images.length]);
+  }, [containerH, containerW, modalExtendsUp, safeAreaTop, images.length, firstImageH]);
 
   const imagesPadding = containerH - snapPoints[1];
+
+  /** Bottom padding for sheet content so the last element (map) can scroll
+   *  fully into view with a consistent gap above the CTA bar. */
+  const MAP_SECTION_H = 230; /* label row + 180px map + caption ≈ 230px */
+  const CONTENT_END_GAP = 20;
+  const expandedContentH = containerH - CTA_H - snapPoints[0] - sheetHeaderH;
+  const contentBottomPad = Math.max(CONTENT_END_GAP, expandedContentH - MAP_SECTION_H);
+
+  /* ── Measure first image actual height ── */
+  const measureFirstImage = useCallback((el: HTMLImageElement | null) => {
+    if (!el) return;
+    const measure = () => {
+      const h = el.offsetHeight;
+      if (h > 0) setFirstImageH(h);
+    };
+    if (el.complete && el.naturalHeight > 0) {
+      measure();
+    } else {
+      el.addEventListener("load", measure, { once: true });
+    }
+  }, []);
+
+  /* Re-snap to default when firstImageH changes (image loads after initial layout) */
+  useEffect(() => {
+    if (firstImageH == null || !ready) return;
+    if (snapIdx === 1) {
+      sheetY.set(snapPoints[1]);
+    }
+  }, [firstImageH]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const h = el.clientHeight;
     const w = el.clientWidth;
-    const parsed = parseInt(getComputedStyle(el).paddingTop, 10);
-    const co = Number.isNaN(parsed) ? 47 : parsed;
     const me = parseInt(
       getComputedStyle(el).getPropertyValue("--modal-extends-up").trim() || "0",
       10
@@ -178,52 +223,52 @@ export function PostDetail({
     );
     setContainerH(h);
     setContainerW(w);
-    setChromeOff(co);
     setModalExtendsUp(Number.isNaN(me) ? 0 : me);
     setSafeAreaTop(Number.isNaN(sa) ? 0 : sa);
+    if (sheetHeaderRef.current) setSheetHeaderH(sheetHeaderRef.current.offsetHeight);
 
-    const allImagesBottom = co + Math.round(w * 0.75) * images.length;
+    const imgH = firstImageH ?? Math.round(w * 0.75);
+    const meVal = Number.isNaN(me) ? 0 : me;
+    const firstImageBottom = meVal + imgH;
+    const allImagesBottom = meVal + imgH * images.length;
     const maxDefault = h - CTA_H - HEADER_H;
-    const initialSheetY = Math.min(allImagesBottom, maxDefault);
+    const initialSheetY = Math.max(firstImageBottom, Math.min(allImagesBottom, maxDefault));
     sheetY.set(initialSheetY);
     setReady(true);
-  }, [sheetY, images.length]);
+  }, [sheetY, images.length, firstImageH]);
+
+  /* ── Resize observer for keyboard / viewport changes ── */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setContainerH(el.clientHeight);
+      setContainerW(el.clientWidth);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const prefersReducedMotion = useMemo(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     [],
   );
 
+  const springConfig = useMemo(
+    () => prefersReducedMotion
+      ? { duration: 0.2, ease: "easeOut" as const }
+      : { type: "spring" as const, damping: 25, stiffness: 250 },
+    [prefersReducedMotion],
+  );
+
   const snapTo = useCallback(
     (idx: number) => {
       const clamped = Math.max(0, Math.min(snapPoints.length - 1, idx));
       setSnapIdx(clamped);
-      animate(sheetY, snapPoints[clamped], prefersReducedMotion
-        ? { duration: 0.2, ease: "easeOut" }
-        : { type: "spring", damping: 25, stiffness: 250 },
-      );
+      animate(sheetY, snapPoints[clamped], springConfig);
     },
-    [snapPoints, sheetY, prefersReducedMotion],
+    [snapPoints, sheetY, springConfig],
   );
-
-  /* ── Drag-following with velocity-based snap ── */
-  const dragRef = useRef<{
-    startClientY: number;
-    startSheetY: number;
-    startTime: number;
-    prevY: number;
-    prevTime: number;
-    didMove: boolean;
-  } | null>(null);
-  const lastDragDidMove = useRef(false);
-
-  const getVelocity = useCallback(() => {
-    const d = dragRef.current;
-    if (!d) return 0;
-    const dt = (d.prevTime - d.startTime) / 1000;
-    if (dt < 0.01) return 0;
-    return (d.prevY - d.startClientY) / dt;
-  }, []);
 
   const findNearestSnapIndex = useCallback(
     (y: number, velocityY: number) => {
@@ -252,71 +297,187 @@ export function PostDetail({
     [snapPoints],
   );
 
-  const handleHeaderPointerDown = useCallback(
+  /* ── Unified gesture coordinator ── */
+  const gestureRef = useRef<GestureData | null>(null);
+  const lastDragDidMove = useRef(false);
+  const momentumRaf = useRef(0);
+  const wheelEndTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /** Route a pointer/wheel delta through the three-phase system.
+   *  delta > 0 = finger moved DOWN, delta < 0 = finger moved UP. */
+  const routeGestureDelta = useCallback(
+    (delta: number) => {
+      const currentY = sheetY.get();
+      const atExpanded = currentY <= snapPoints[0] + 1;
+      const atDefault = currentY >= snapPoints[1] - 1;
+      const imgEl = imagesRef.current;
+      const cntEl = contentRef.current;
+
+      if (delta < 0) {
+        /* ── UPWARD gesture ── */
+        if (!atDefault && !atExpanded) {
+          // Sheet mid-drag → keep moving up
+          sheetY.set(Math.max(snapPoints[0], currentY + delta));
+        } else if (atDefault) {
+          const maxImgScroll = imgEl ? imgEl.scrollHeight - imgEl.clientHeight : 0;
+          const imgAtBottom = maxImgScroll <= 0 || (imgEl ? imgEl.scrollTop >= maxImgScroll - 2 : true);
+          if (!imgAtBottom && imgEl) {
+            // Scroll images up
+            imgEl.scrollTop = Math.min(maxImgScroll, imgEl.scrollTop - delta);
+          } else {
+            // Images at bottom → start expanding sheet
+            sheetY.set(Math.max(snapPoints[0], currentY + delta));
+          }
+        } else if (atExpanded && cntEl) {
+          // Scroll content up
+          const maxScroll = cntEl.scrollHeight - cntEl.clientHeight;
+          cntEl.scrollTop = Math.min(maxScroll, cntEl.scrollTop - delta);
+        }
+      } else if (delta > 0) {
+        /* ── DOWNWARD gesture ── */
+        if (atExpanded || (!atDefault && !atExpanded)) {
+          const contentAtTop = !cntEl || cntEl.scrollTop <= 1;
+          if (!contentAtTop && cntEl) {
+            // Content not at top → scroll content down
+            cntEl.scrollTop = Math.max(0, cntEl.scrollTop - delta);
+          } else if (!atDefault) {
+            // Content at top → collapse sheet
+            sheetY.set(Math.min(snapPoints[1], currentY + delta));
+          }
+        } else if (atDefault && imgEl) {
+          // Scroll images down
+          imgEl.scrollTop = Math.max(0, imgEl.scrollTop - delta);
+        }
+      }
+    },
+    [sheetY, snapPoints],
+  );
+
+  function computeVelocity(samples: Array<{ dy: number; dt: number }>): number {
+    if (samples.length === 0) return 0;
+    let totalDy = 0;
+    let totalDt = 0;
+    for (const s of samples) {
+      totalDy += s.dy;
+      totalDt += s.dt;
+    }
+    if (totalDt < 1) return 0;
+    return (totalDy / totalDt) * 1000; // px/s
+  }
+
+  /** Determine which phase the sheet is in right now for momentum. */
+  const getCurrentPhase = useCallback((): "images" | "sheet" | "content" => {
+    const currentY = sheetY.get();
+    const atExpanded = currentY <= snapPoints[0] + 1;
+    const atDefault = currentY >= snapPoints[1] - 1;
+    if (atExpanded) return "content";
+    if (atDefault) return "images";
+    return "sheet";
+  }, [sheetY, snapPoints]);
+
+  const cancelMomentum = useCallback(() => {
+    if (momentumRaf.current) {
+      cancelAnimationFrame(momentumRaf.current);
+      momentumRaf.current = 0;
+    }
+  }, []);
+
+  /* ── Pointer event handlers ── */
+  const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest("[data-no-gesture]") || target.tagName === "INPUT") return;
+
+      cancelMomentum();
       e.preventDefault();
-      (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-      const clientY = e.clientY;
+
       const now = Date.now();
-      dragRef.current = {
-        startClientY: clientY,
-        startSheetY: sheetY.get(),
-        startTime: now,
-        prevY: clientY,
+      gestureRef.current = {
+        active: true,
+        startClientY: e.clientY,
+        prevClientY: e.clientY,
         prevTime: now,
         didMove: false,
+        samples: [],
       };
     },
-    [sheetY],
+    [cancelMomentum],
   );
 
   useEffect(() => {
     if (!ready || snapPoints.length === 0) return;
 
     const onPointerMove = (e: PointerEvent) => {
-      const d = dragRef.current;
-      if (!d) return;
+      const g = gestureRef.current;
+      if (!g || !g.active) return;
+
       const clientY = e.clientY;
-      const deltaY = clientY - d.startClientY;
-      const newY = Math.max(
-        snapPoints[0],
-        Math.min(snapPoints[snapPoints.length - 1], d.startSheetY + deltaY),
-      );
-      sheetY.set(newY);
-      if (Math.abs(deltaY) > CLICK_THRESHOLD) d.didMove = true;
-      d.prevY = clientY;
-      d.prevTime = Date.now();
+      const delta = clientY - g.prevClientY;
+      const totalDelta = Math.abs(clientY - g.startClientY);
+
+      if (totalDelta > CLICK_THRESHOLD) g.didMove = true;
+
+      if (g.didMove) {
+        routeGestureDelta(delta);
+      }
+
+      const now = Date.now();
+      g.samples.push({ dy: delta, dt: now - g.prevTime });
+      if (g.samples.length > 5) g.samples.shift();
+      g.prevClientY = clientY;
+      g.prevTime = now;
     };
 
-    const onPointerUp = (e: PointerEvent) => {
-      const d = dragRef.current;
-      if (!d) return;
-      lastDragDidMove.current = d.didMove;
-      (e.target as HTMLElement)?.releasePointerCapture?.(e.pointerId);
-      const velocityY = getVelocity();
+    const onPointerUp = () => {
+      const g = gestureRef.current;
+      if (!g || !g.active) return;
+      g.active = false;
+      lastDragDidMove.current = g.didMove;
+
+      const velocity = computeVelocity(g.samples); // px/s, positive = down
       const currentY = sheetY.get();
-      const targetIdx = findNearestSnapIndex(currentY, velocityY);
-      setSnapIdx(targetIdx);
-      animate(sheetY, snapPoints[targetIdx], prefersReducedMotion
-        ? { duration: 0.2, ease: "easeOut" }
-        : { type: "spring", damping: 25, stiffness: 250 },
-      );
-      dragRef.current = null;
+      const sheetBetween = currentY > snapPoints[0] + 1 && currentY < snapPoints[1] - 1;
+
+      if (sheetBetween) {
+        // Sheet is mid-drag → snap
+        const targetIdx = findNearestSnapIndex(currentY, velocity);
+        setSnapIdx(targetIdx);
+        animate(sheetY, snapPoints[targetIdx], springConfig);
+      } else {
+        // Apply momentum to image or content scroll
+        const phase = getCurrentPhase();
+        if ((phase === "images" || phase === "content") && Math.abs(velocity) > 100) {
+          const el = phase === "images" ? imagesRef.current : contentRef.current;
+          if (el) {
+            let v = -velocity / 60; // px/frame (negate: positive velocity = finger down = scrollTop decreases)
+            const step = () => {
+              v *= MOMENTUM_DECAY;
+              if (Math.abs(v) < MOMENTUM_STOP) return;
+              const max = el.scrollHeight - el.clientHeight;
+              el.scrollTop = Math.max(0, Math.min(max, el.scrollTop + v));
+              momentumRaf.current = requestAnimationFrame(step);
+            };
+            momentumRaf.current = requestAnimationFrame(step);
+          }
+        }
+      }
+
+      gestureRef.current = null;
     };
 
-    const onPointerCancel = (e: PointerEvent) => {
-      const d = dragRef.current;
-      if (!d) return;
-      lastDragDidMove.current = d.didMove;
-      (e.target as HTMLElement)?.releasePointerCapture?.(e.pointerId);
+    const onPointerCancel = () => {
+      const g = gestureRef.current;
+      if (!g || !g.active) return;
+      g.active = false;
+      lastDragDidMove.current = g.didMove;
+
       const currentY = sheetY.get();
-      const targetIdx = findNearestSnapIndex(currentY, 0);
-      setSnapIdx(targetIdx);
-      animate(sheetY, snapPoints[targetIdx], prefersReducedMotion
-        ? { duration: 0.2, ease: "easeOut" }
-        : { type: "spring", damping: 25, stiffness: 250 },
-      );
-      dragRef.current = null;
+      if (currentY > snapPoints[0] + 1 && currentY < snapPoints[1] - 1) {
+        const targetIdx = findNearestSnapIndex(currentY, 0);
+        setSnapIdx(targetIdx);
+        animate(sheetY, snapPoints[targetIdx], springConfig);
+      }
+      gestureRef.current = null;
     };
 
     document.addEventListener("pointermove", onPointerMove, { passive: true });
@@ -327,20 +488,37 @@ export function PostDetail({
       document.removeEventListener("pointerup", onPointerUp);
       document.removeEventListener("pointercancel", onPointerCancel);
     };
-  }, [ready, snapPoints, sheetY, getVelocity, findNearestSnapIndex, prefersReducedMotion]);
+  }, [ready, snapPoints, sheetY, findNearestSnapIndex, springConfig, routeGestureDelta, getCurrentPhase]);
 
-  /* ── Scroll-wheel on header: scroll up → expand, scroll down → collapse ── */
-  const handleHeaderWheel = useCallback(
-    (e: React.WheelEvent) => {
+  /* ── Wheel handler (needs passive:false to preventDefault) ── */
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !ready) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if ((e.target as HTMLElement).closest("[data-no-gesture]")) return;
       e.preventDefault();
-      if (e.deltaY < -10) {
-        snapTo(snapIdx - 1);
-      } else if (e.deltaY > 10) {
-        snapTo(snapIdx + 1);
-      }
-    },
-    [snapIdx, snapTo],
-  );
+
+      routeGestureDelta(-e.deltaY * 0.5);
+
+      // Debounced snap when sheet is between snap points
+      if (wheelEndTimer.current) clearTimeout(wheelEndTimer.current);
+      wheelEndTimer.current = setTimeout(() => {
+        const currentY = sheetY.get();
+        if (currentY > snapPoints[0] + 1 && currentY < snapPoints[1] - 1) {
+          const targetIdx = findNearestSnapIndex(currentY, 0);
+          setSnapIdx(targetIdx);
+          animate(sheetY, snapPoints[targetIdx], springConfig);
+        }
+      }, WHEEL_SNAP_DELAY);
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [ready, snapPoints, sheetY, findNearestSnapIndex, springConfig, routeGestureDelta]);
+
+  /* ── Cleanup momentum on unmount ── */
+  useEffect(() => () => cancelMomentum(), [cancelMomentum]);
 
   const isExpanded = snapIdx === 0;
 
@@ -369,57 +547,16 @@ export function PostDetail({
     snapTo(isExpanded ? 1 : 0);
   }, [isExpanded, snapTo]);
 
-  /* ── Magnet: scroll past last image → pull drawer up ── */
-  const imgTouchStartY = useRef(0);
-
-  const isImagesAtBottom = useCallback(() => {
-    const el = imagesRef.current;
-    if (!el) return true;
-    return el.scrollHeight <= el.clientHeight ||
-      el.scrollTop + el.clientHeight >= el.scrollHeight - 4;
-  }, []);
-
-  const handleContainerWheel = useCallback(
-    (e: React.WheelEvent) => {
-      if (isExpanded) return;
-      const atBottom = isImagesAtBottom();
-      if (e.deltaY > 0 && atBottom) {
-        snapTo(0);
-      }
-    },
-    [isExpanded, snapTo, isImagesAtBottom],
-  );
-
-  const handleContainerTouchStart = useCallback((e: React.TouchEvent) => {
-    imgTouchStartY.current = e.touches[0].clientY;
-  }, []);
-
-  const handleContainerTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (isExpanded) return;
-      const dy = imgTouchStartY.current - e.changedTouches[0].clientY;
-      const atBottom = isImagesAtBottom();
-      if (dy > MAGNET_SWIPE_THRESHOLD && atBottom) {
-        snapTo(0);
-      }
-    },
-    [isExpanded, snapTo, isImagesAtBottom],
-  );
-
-  const handleImagesScroll = useCallback(() => {
-    // Scroll handler for sheet magnet logic — no-op, magnet triggered by wheel/touch
-  }, []);
-
   return (
     <div
       ref={containerRef}
       className="relative flex h-full flex-col overflow-hidden bg-black"
-      onWheel={handleContainerWheel}
-      onTouchStart={handleContainerTouchStart}
-      onTouchEnd={handleContainerTouchEnd}
+      style={{ touchAction: "none" }}
+      onPointerDown={handlePointerDown}
     >
       {/* ── Floating glass navigation ── */}
       <div
+        data-no-gesture
         className="pointer-events-none absolute left-4 right-4 z-30 flex items-start justify-between"
         style={{ top: "calc(var(--safe-area-top) + 12px + var(--modal-extends-up, 0px))" }}
       >
@@ -460,12 +597,12 @@ export function PostDetail({
         </div>
       </div>
 
-      {/* ── Images — scroll behind the sheet ── */}
+      {/* ── Images — scroll behind the sheet (driven by gesture coordinator) ── */}
       <div
         ref={imagesRef}
-        className="relative flex-1 overflow-y-auto overscroll-contain scrollbar-none"
-        onScroll={handleImagesScroll}
+        className="relative flex-1 overflow-hidden overscroll-contain scrollbar-none"
         style={{
+          paddingTop: modalExtendsUp > 0 ? `${modalExtendsUp}px` : undefined,
           paddingBottom: `${imagesPadding}px`,
           pointerEvents: isExpanded ? "none" : undefined,
         }}
@@ -476,11 +613,13 @@ export function PostDetail({
             type="button"
             className="relative block w-full outline-none active:opacity-95"
             onClick={() => {
+              if (lastDragDidMove.current) return;
               setViewerIndex(i);
               setViewerOpen(true);
             }}
           >
             <img
+              ref={i === 0 ? measureFirstImage : undefined}
               src={src}
               alt={`${variant.title} ${i + 1}`}
               className="block w-full h-auto"
@@ -498,18 +637,13 @@ export function PostDetail({
         style={{ opacity: imageOverlayOpacity, pointerEvents: "none" }}
       />
 
-      {/* ── Bottom sheet (swipe-to-snap, no drag-following) ── */}
+      {/* ── Bottom sheet ── */}
       <motion.div
         className="absolute inset-x-0 top-0 z-20 flex flex-col bg-cl-surface shadow-[var(--shadow-sheet)]"
         style={{ y: sheetY, bottom: CTA_H, visibility: ready ? "visible" : "hidden" }}
       >
-        {/* Header — drag / scroll / click target (handle + title + price) */}
-        <div
-          className="shrink-0 select-none"
-          style={{ cursor: "grab", touchAction: "none" }}
-          onPointerDown={handleHeaderPointerDown}
-          onWheel={handleHeaderWheel}
-        >
+        {/* Header — handle + title + price */}
+        <div ref={sheetHeaderRef} className="shrink-0 select-none" style={{ cursor: "grab" }}>
           <button
             type="button"
             className="flex w-full justify-center pt-2.5 pb-1 outline-none"
@@ -537,10 +671,10 @@ export function PostDetail({
           </div>
         </div>
 
-        {/* Content — scrollable so user can reach map, attributes, etc. */}
+        {/* Content — scrollable (driven by gesture coordinator) */}
         <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none"
-          style={{ touchAction: "pan-y" }}
+          ref={contentRef}
+          className="min-h-0 flex-1 overflow-hidden overscroll-contain scrollbar-none"
         >
           {/* Quick-info chips */}
           <div className="mt-3 flex flex-wrap gap-2 px-4">
@@ -591,7 +725,7 @@ export function PostDetail({
           <div className="mx-4 mt-4 border-t-[0.5px] border-cl-border" />
 
           {/* Location / Map */}
-          <div className="mt-4 px-4 pb-36">
+          <div className="mt-4 px-4" style={{ paddingBottom: `${contentBottomPad}px` }}>
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[13px] font-medium text-cl-text">
                 {variant.hood}
@@ -599,6 +733,7 @@ export function PostDetail({
               <button
                 type="button"
                 className="flex items-center gap-1 outline-none active:opacity-70"
+                data-no-gesture
               >
                 <span className="text-[12px] font-medium text-cl-accent">open in maps</span>
                 <ExternalLink className="h-3.5 w-3.5 text-cl-accent" strokeWidth={2} />
@@ -630,7 +765,7 @@ export function PostDetail({
       </motion.div>
 
       {/* ── Fixed CTA — always pinned to bottom, outside the sheet ── */}
-      <div className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3 pb-[34px]">
+      <div data-no-gesture className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3" style={{ paddingBottom: "max(34px, env(safe-area-inset-bottom, 34px))", touchAction: "auto" }}>
         <div className="flex items-center gap-2">
           <input
             type="text"
