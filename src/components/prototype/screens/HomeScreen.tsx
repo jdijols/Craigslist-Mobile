@@ -178,6 +178,14 @@ export function HomeScreen({
 
   const isHome = activeCategory === "all CL";
   const isMapView = viewMode === "map";
+
+  // Ensure category row is visible when switching to map view
+  useEffect(() => {
+    if (isMapView) {
+      collapsedRef.current = false;
+      setHeaderCollapsed(false);
+    }
+  }, [isMapView]);
   const showOverlay = !isHome || !!searchTerm;
 
   const viewKey = searchTerm ? `search|${searchTerm}` : isHome ? "all CL" : `${activeCategory}|${activeSubcategory ?? ""}`;

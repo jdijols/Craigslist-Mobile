@@ -8,9 +8,9 @@ import {
 } from "react";
 
 /** Default status bar colors by system preference (main app header).
- * Matches --color-cl-surface: light #ffffff, dark #000000 from index.css tokens. */
+ * Matches --color-cl-surface: light #ffffff, dark #0f0f0f from index.css tokens. */
 const DEFAULT_LIGHT = "#ffffff";
-const DEFAULT_DARK = "#000000";
+const DEFAULT_DARK = "#0f0f0f";
 
 function isTransparent(color: string): boolean {
   if (!color || color === "transparent") return true;
