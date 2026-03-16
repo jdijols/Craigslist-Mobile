@@ -120,9 +120,10 @@ export function SearchScreen({
   }, [isTyping]);
 
   useEffect(() => {
-    inputRef.current?.focus();
-    const raf = requestAnimationFrame(() => inputRef.current?.focus());
-    return () => cancelAnimationFrame(raf);
+    // Delay focus until after the slide-in animation (200ms) completes
+    // to prevent iOS Safari keyboard resize from interrupting the transition
+    const timer = setTimeout(() => inputRef.current?.focus(), 250);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleSubmit = useCallback(
@@ -266,7 +267,6 @@ export function SearchScreen({
               <input
                 ref={inputRef}
                 type="text"
-                autoFocus
                 enterKeyHint="search"
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}

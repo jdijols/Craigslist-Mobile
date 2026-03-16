@@ -154,6 +154,7 @@ export function PostDetail({
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
   const sheetY = useMotionValue(0);
   const [snapIdx, setSnapIdx] = useState(1);
   const [ready, setReady] = useState(false);
@@ -162,29 +163,23 @@ export function PostDetail({
   const [containerW, setContainerW] = useState(390);
   const [modalExtendsUp, setModalExtendsUp] = useState(0);
   const [safeAreaTop, setSafeAreaTop] = useState(44);
+  const [ctaH, setCtaH] = useState(CTA_H);
   const [firstImageH, setFirstImageH] = useState<number | null>(null);
-  const sheetHeaderRef = useRef<HTMLDivElement>(null);
-  const [sheetHeaderH, setSheetHeaderH] = useState(70);
-
   const snapPoints = useMemo(() => {
     const overlayBottom = safeAreaTop + OVERLAY_BTN_GAP + modalExtendsUp + OVERLAY_BTN_H;
     const fullSnap = overlayBottom + OVERLAY_GAP;
     const imageH = firstImageH ?? Math.round(containerW * 0.75);
     const firstImageBottom = modalExtendsUp + imageH;
     const allImagesBottom = modalExtendsUp + imageH * images.length;
-    const maxDefault = containerH - CTA_H - HEADER_H;
+    const maxDefault = containerH - ctaH - HEADER_H;
     const defaultSnap = Math.max(firstImageBottom, Math.min(allImagesBottom, maxDefault));
     return [fullSnap, defaultSnap];
-  }, [containerH, containerW, modalExtendsUp, safeAreaTop, images.length, firstImageH]);
+  }, [containerH, containerW, modalExtendsUp, safeAreaTop, images.length, firstImageH, ctaH]);
 
   const imagesPadding = containerH - snapPoints[1];
 
-  /** Bottom padding for sheet content so the last element (map) can scroll
-   *  fully into view with a consistent gap above the CTA bar. */
-  const MAP_SECTION_H = 230; /* label row + 180px map + caption ≈ 230px */
-  const CONTENT_END_GAP = 20;
-  const expandedContentH = containerH - CTA_H - snapPoints[0] - sheetHeaderH;
-  const contentBottomPad = Math.max(CONTENT_END_GAP, expandedContentH - MAP_SECTION_H);
+  /* Bottom padding so content clears the hidden zone behind the CTA bar */
+  const contentBottomPad = snapPoints[0] + 20;
 
   /* ── Measure first image actual height ── */
   const measureFirstImage = useCallback((el: HTMLImageElement | null) => {
@@ -225,19 +220,18 @@ export function PostDetail({
     setContainerW(w);
     setModalExtendsUp(Number.isNaN(me) ? 0 : me);
     setSafeAreaTop(Number.isNaN(sa) ? 0 : sa);
-    if (sheetHeaderRef.current) setSheetHeaderH(sheetHeaderRef.current.offsetHeight);
 
     const imgH = firstImageH ?? Math.round(w * 0.75);
     const meVal = Number.isNaN(me) ? 0 : me;
     const firstImageBottom = meVal + imgH;
     const allImagesBottom = meVal + imgH * images.length;
-    const maxDefault = h - CTA_H - HEADER_H;
+    const maxDefault = h - ctaH - HEADER_H;
     const initialSheetY = Math.max(firstImageBottom, Math.min(allImagesBottom, maxDefault));
     sheetY.set(initialSheetY);
     setReady(true);
   }, [sheetY, images.length, firstImageH]);
 
-  /* ── Resize observer for keyboard / viewport changes ── */
+  /* ── Resize observers for container & content ── */
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -248,6 +242,17 @@ export function PostDetail({
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  /* ── Measure CTA bar height (varies with env(safe-area-inset-bottom)) ── */
+  useEffect(() => {
+    const el = ctaRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setCtaH(el.offsetHeight));
+    ro.observe(el);
+    setCtaH(el.offsetHeight);
+    return () => ro.disconnect();
+  }, []);
+
 
   const prefersReducedMotion = useMemo(
     () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -640,10 +645,10 @@ export function PostDetail({
       {/* ── Bottom sheet ── */}
       <motion.div
         className="absolute inset-x-0 top-0 z-20 flex flex-col bg-cl-surface shadow-[var(--shadow-sheet)]"
-        style={{ y: sheetY, bottom: CTA_H, visibility: ready ? "visible" : "hidden" }}
+        style={{ y: sheetY, bottom: ctaH, visibility: ready ? "visible" : "hidden" }}
       >
         {/* Header — handle + title + price */}
-        <div ref={sheetHeaderRef} className="shrink-0 select-none" style={{ cursor: "grab" }}>
+        <div className="shrink-0 select-none" style={{ cursor: "grab" }}>
           <button
             type="button"
             className="flex w-full justify-center pt-2.5 pb-1 outline-none"
@@ -765,7 +770,7 @@ export function PostDetail({
       </motion.div>
 
       {/* ── Fixed CTA — always pinned to bottom, outside the sheet ── */}
-      <div data-no-gesture className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3" style={{ paddingBottom: "max(34px, env(safe-area-inset-bottom, 34px))", touchAction: "auto" }}>
+      <div ref={ctaRef} data-no-gesture className="absolute inset-x-0 bottom-0 z-30 border-t-[0.5px] border-cl-border bg-cl-surface px-4 pt-3" style={{ paddingBottom: "max(34px, env(safe-area-inset-bottom, 34px))", touchAction: "auto" }}>
         <div className="flex items-center gap-2">
           <input
             type="text"
