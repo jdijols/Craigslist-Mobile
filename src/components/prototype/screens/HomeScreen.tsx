@@ -72,6 +72,21 @@ function getCategoryDisplayName(chipLabel: string): string {
   return cat?.name ?? chipLabel;
 }
 
+/** Default card view per top-level category. */
+const categoryDefaultView: Record<string, ViewMode> = {
+  "for-sale": "grid",
+  jobs: "thumb",
+  housing: "gallery",
+  services: "thumb",
+  community: "thumb",
+  resumes: "list",
+};
+
+function getDefaultViewForCategory(chipLabel: string): ViewMode {
+  const id = chipLabelToCategoryId(chipLabel);
+  return categoryDefaultView[id] ?? "thumb";
+}
+
 export interface RestoreData {
   sortBy?: string;
   distance?: string;
@@ -125,6 +140,11 @@ export function HomeScreen({
   useEffect(() => {
     if (initialViewMode != null) setViewMode(initialViewMode);
   }, [initialViewMode]);
+
+  // Switch to category-specific default view when category changes
+  useEffect(() => {
+    setViewMode(getDefaultViewForCategory(activeCategory));
+  }, [activeCategory]);
   const [activeDistance, setActiveDistance] = useState(DEFAULT_DISTANCE);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -348,8 +368,8 @@ export function HomeScreen({
     [activeCategory, activeSubcategory],
   );
 
-  /** Option C: fixed 92px (4px gap + 44 header bar + 44 buffer). Category row overlays the buffer when expanded. */
-  const headerPaddingTop = 92;
+  /** Option C: fixed 96px (4px gap + 48 header bar + 44 buffer). Category row overlays the buffer when expanded. */
+  const headerPaddingTop = 96;
 
   return (
     <div className="relative h-full">
@@ -400,7 +420,7 @@ export function HomeScreen({
         {/* Layer 2: category row overlay — overlays the 44px buffer in scroll content (4px overlap eliminates gap) */}
         <div
           className={`absolute left-0 right-0 z-10 overflow-hidden bg-cl-surface ${!headerCollapsed ? "border-b-[0.5px] border-cl-border" : ""}`}
-          style={{ top: "calc(var(--safe-area-top) + 4px + 40px)" }}
+          style={{ top: "calc(var(--safe-area-top) + 4px + 44px)" }}
         >
           <CategoryRow
             labels={chipLabels}
@@ -1035,7 +1055,7 @@ function CategoryContent({
               )}
 
               {viewMode === "gallery" && (
-                <div className="space-y-4">
+                <div className="-mx-4 space-y-0.5">
                   {listings.map((item) => (
                     <GalleryCard
                       key={item.id}
@@ -1195,7 +1215,7 @@ function SearchResultsContent({
   }
 
   return (
-    <div className="absolute inset-0 flex flex-col overflow-hidden bg-cl-surface">
+    <div className="absolute inset-0 flex flex-col overflow-hidden bg-cl-bg">
       {viewMode === "map" ? (
         <div className="flex-1 min-h-0 flex flex-col pb-[72px]" style={{ paddingTop: `calc(var(--safe-area-top) + ${headerPaddingTop}px)` }}>
           <MapView
@@ -1243,7 +1263,7 @@ function SearchResultsContent({
           )}
 
           {viewMode === "gallery" && (
-            <div className="space-y-4">
+            <div className="-mx-4 space-y-0.5">
               {results.map((item) => (
                 <GalleryCard key={item.id} data={item} onClick={() => nav(item)} />
               ))}

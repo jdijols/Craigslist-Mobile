@@ -169,7 +169,7 @@ export function FavoritesScreen({ onNavigate, onOpenListing }: FavoritesScreenPr
               )}
 
               {viewMode === "gallery" && (
-                <div className="space-y-4 px-4">
+                <div className="space-y-0.5">
                   {filteredFavorites.map((item) => (
                     <GalleryCard key={item.id} data={item} onClick={() => nav(item)} />
                   ))}

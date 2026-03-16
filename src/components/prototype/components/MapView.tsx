@@ -203,7 +203,7 @@ export function MapView({ listings, onOpenListing, mapRef, onCenterChange, cente
             className="absolute bottom-0 left-0 right-0 z-30"
           >
             <div
-              className="mx-3 mb-3 shadow-[--shadow-elevated] rounded-[--radius-card-lg] overflow-hidden"
+              className="shadow-[--shadow-elevated] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <MapCard key={activeListing.id} data={activeListing} onClick={() => onOpenListing?.(activeListing)} />

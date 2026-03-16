@@ -76,7 +76,7 @@ export function GalleryCard({ data, onClick }: GalleryCardProps) {
   }, [images.length, goTo]);
 
   return (
-    <div className="w-full overflow-hidden rounded-[--radius-card-lg] bg-cl-surface text-left">
+    <div className="w-full overflow-hidden bg-cl-surface text-left">
       {/* Scrollable image carousel — one image per scroll */}
       <div className="relative">
         <button
